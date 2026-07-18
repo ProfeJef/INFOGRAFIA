@@ -1,4 +1,4 @@
-// components.js — fondo panorámico fijo + avatar sprite + estaciones del mapa
+// components.js — fondo panorámico fijo + avatar + estaciones sobre el sendero
 const TILE = 32;
 const COLS = 32;
 const ROWS = 18;
@@ -18,8 +18,8 @@ const ASSETS = {
   viernes: new Image()
 };
 
-// Rutas reales en tu repo
-ASSETS.background.src = 'assets/FONDO-INFOGRAFIA.png';
+// Rutas reales
+ASSETS.background.src = 'assets/FONDO-INFOGRAFÍA.png';
 ASSETS.avatar.src = 'assets/avatar-1.png';
 ASSETS.lunes.src = 'assets/lunes-1.png';
 ASSETS.martes.src = 'assets/martes-1.png';
@@ -27,13 +27,13 @@ ASSETS.miercoles.src = 'assets/miercoles-1.png';
 ASSETS.jueves.src = 'assets/jueves-1.png';
 ASSETS.viernes.src = 'assets/viernes-1.png';
 
-// Coordenadas de interacción dentro del mapa panorámico
+// Estaciones colocadas sobre el sendero, frente a cada plataforma
 const MAP_STATIONS = {
-  d1: { x: 220, y: 220, r: 60, label: 'LUNES', image: 'lunes' },
-  d2: { x: 385, y: 205, r: 60, label: 'MARTES', image: 'martes' },
-  d3: { x: 565, y: 205, r: 60, label: 'MIERCOLES', image: 'miercoles' },
-  d4: { x: 760, y: 220, r: 60, label: 'JUEVES', image: 'jueves' },
-  d5: { x: 920, y: 220, r: 60, label: 'VIERNES', image: 'viernes' }
+  d1: { x: 220, y: 380, r: 42, label: 'LUNES', image: 'lunes' },
+  d2: { x: 380, y: 380, r: 42, label: 'MARTES', image: 'martes' },
+  d3: { x: 545, y: 380, r: 42, label: 'MIERCOLES', image: 'miercoles' },
+  d4: { x: 715, y: 380, r: 42, label: 'JUEVES', image: 'jueves' },
+  d5: { x: 885, y: 380, r: 42, label: 'VIERNES', image: 'viernes' }
 };
 
 function isAssetReady(img) {
@@ -42,19 +42,7 @@ function isAssetReady(img) {
 
 function drawBackground(ctx) {
   if (isAssetReady(ASSETS.background)) {
-    const img = ASSETS.background;
-
-    ctx.clearRect(0, 0, GAME.width, GAME.height);
-    ctx.fillStyle = '#8fd6f0';
-    ctx.fillRect(0, 0, GAME.width, GAME.height);
-
-    const scale = Math.min(GAME.width / img.width, GAME.height / img.height);
-    const w = img.width * scale;
-    const h = img.height * scale;
-    const x = (GAME.width - w) / 2;
-    const y = (GAME.height - h) / 2;
-
-    ctx.drawImage(img, x, y, w, h);
+    ctx.drawImage(ASSETS.background, 0, 0, GAME.width, GAME.height);
   } else {
     ctx.fillStyle = '#8fd6f0';
     ctx.fillRect(0, 0, GAME.width, GAME.height);
@@ -63,7 +51,9 @@ function drawBackground(ctx) {
 
 function drawAvatar(ctx, player) {
   if (isAssetReady(ASSETS.avatar)) {
-    ctx.drawImage(ASSETS.avatar, player.x - 28, player.y - 58, 58, 78);
+    const w = 64;
+    const h = 88;
+    ctx.drawImage(ASSETS.avatar, player.x - w / 2, player.y - h + 6, w, h);
   } else {
     ctx.fillStyle = '#d62828';
     ctx.fillRect(player.x - 10, player.y - 24, 20, 24);
@@ -73,17 +63,18 @@ function drawAvatar(ctx, player) {
 function drawStationGlow(ctx, station, active = false) {
   ctx.save();
 
-  const radius = active ? station.r + 10 : station.r - 8;
-  const alpha = active ? 0.28 : 0.12;
+  const radius = active ? station.r + 12 : station.r - 10;
+  const alpha = active ? 0.32 : 0.10;
 
-  const g = ctx.createRadialGradient(
-    station.x, station.y, 8,
+  const gradient = ctx.createRadialGradient(
+    station.x, station.y, 6,
     station.x, station.y, radius
   );
-  g.addColorStop(0, `rgba(255,255,180,${alpha})`);
-  g.addColorStop(1, 'rgba(255,255,180,0)');
 
-  ctx.fillStyle = g;
+  gradient.addColorStop(0, `rgba(255,255,180,${alpha})`);
+  gradient.addColorStop(1, 'rgba(255,255,180,0)');
+
+  ctx.fillStyle = gradient;
   ctx.beginPath();
   ctx.arc(station.x, station.y, radius, 0, Math.PI * 2);
   ctx.fill();
@@ -97,17 +88,17 @@ function drawStationHint(ctx, player) {
 
   ctx.save();
 
-  ctx.fillStyle = 'rgba(0,0,0,0.82)';
-  ctx.fillRect(player.x - 42, player.y - 98, 84, 30);
+  ctx.fillStyle = 'rgba(0,0,0,0.84)';
+  ctx.fillRect(player.x - 42, player.y - 92, 84, 28);
 
   ctx.strokeStyle = '#ffffff';
   ctx.lineWidth = 2;
-  ctx.strokeRect(player.x - 42, player.y - 98, 84, 30);
+  ctx.strokeRect(player.x - 42, player.y - 92, 84, 28);
 
   ctx.fillStyle = '#ffffff';
   ctx.font = 'bold 18px VT323, monospace';
   ctx.textAlign = 'center';
-  ctx.fillText('Presiona E', player.x, player.y - 78);
+  ctx.fillText('Presiona E', player.x, player.y - 72);
 
   ctx.restore();
 }
@@ -118,7 +109,10 @@ function getNearbyStation(player) {
     const dx = player.x - s.x;
     const dy = player.y - s.y;
     const dist = Math.hypot(dx, dy);
-    if (dist <= s.r) return { key, ...s };
+
+    if (dist <= s.r) {
+      return { key, ...s };
+    }
   }
   return null;
 }
@@ -139,10 +133,10 @@ function drawScene(ctx, player) {
 }
 
 function clampPlayerToPath(player) {
-  const minX = 70;
-  const maxX = 965;
-  const minY = 300;
-  const maxY = 470;
+  const minX = 140;
+  const maxX = 930;
+  const minY = 370;
+  const maxY = 410;
 
   player.x = Math.max(minX, Math.min(maxX, player.x));
   player.y = Math.max(minY, Math.min(maxY, player.y));
