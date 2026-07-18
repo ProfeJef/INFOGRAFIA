@@ -21,10 +21,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const visited = new Set();
 
   const player = {
-    x: PATH.startX,
-    y: PATH.y,
-    speed: 3
-  };
+  x: 60,
+  y: 445,
+  speed: 3
+};
 
   const keys = {};
   let lastInteractionKey = null;
