@@ -1,11 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ruta Pedagogica Semanal - Recorrido Interactivo</title>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ruta semanal ASE</title>
@@ -19,14 +14,6 @@
 <body>
   <div id="loading">Cargando...</div>
 
-<div id="loading">Cargando ruta...</div>
-
-<div id="welcomeOverlay">
-  <div class="welcomeBox">
-    <h1>MAPA DE RUTA PEDAGOGICA</h1>
-    <p>Semana del Descanso Significativo</p>
-    <p class="hint">Usa las flechas / WASD para caminar. Presiona <b>E</b> o toca el boton de accion para interactuar en cada estacion.</p>
-    <button id="startBtn">COMENZAR RECORRIDO ▶</button>
   <div id="welcomeOverlay">
     <div class="welcomeBox">
       <h1>Ruta semanal ASE</h1>
@@ -37,28 +24,8 @@
       <p class="hint">También puedes usar flechas, WASD o controles táctiles.</p>
       <button id="startBtn">Comenzar</button>
     </div>
-</div>
-</div>
+  </div>
 
-<div id="hud">
-  <div class="hudBar">
-    <span class="hudIcon">❤️</span>
-    <div class="barOuter"><div class="barInner red" id="aseBar"></div></div>
-    <span id="asePct">0%</span>
-  </div>
-  <div class="hudBar">
-    <span class="hudIcon">📅</span>
-    <div class="barOuter"><div class="barInner yellow" id="weekBar"></div></div>
-    <span id="weekPct">0%</span>
-  </div>
-  <div class="hudBar">
-    <span class="hudIcon">⭐</span>
-    <div class="barOuter"><div class="barInner green" id="flowBar"></div></div>
-    <span id="flowPct">0%</span>
-  </div>
-  <div id="progressBox">
-    <div id="progressFill"></div>
-    <span id="progressText">0/7 dias</span>
   <header id="hud">
     <div class="hudBar">
       <span class="hudIcon">❤️</span>
@@ -95,27 +62,16 @@
 
   <div id="gameWrap">
     <canvas id="game" width="1024" height="576"></canvas>
-</div>
-</div>
+  </div>
 
-<canvas id="game" width="960" height="540"></canvas>
-<div id="fade"></div>
   <div id="fade"></div>
 
   <div id="joystickZone">
     <div id="joystickStick"></div>
   </div>
 
-<div id="joystickZone"><div id="joystickStick"></div></div>
-<button id="btnAction">E</button>
   <button id="btnAction" aria-label="Interactuar">E</button>
 
-<div id="modalOverlay">
-  <div class="modalBox">
-    <span id="modalTag"></span>
-    <h2 id="modalTitle"></h2>
-    <div id="modalBody"></div>
-    <button id="closeBtn">CERRAR ▶</button>
   <div id="modalOverlay">
     <div class="modalBox">
       <div id="modalTag">DÍA</div>
@@ -123,12 +79,8 @@
       <div id="modalBody"></div>
       <button id="closeBtn">Cerrar</button>
     </div>
-</div>
-</div>
+  </div>
 
-<script src="data.js"></script>
-<script src="components.js"></script>
-<script src="main.js"></script>
   <script src="js/data.js"></script>
   <script src="js/components.js"></script>
   <script src="js/main.js"></script>
