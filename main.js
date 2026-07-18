@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   function openStation(key) {
-    const s = STATIONS[key];
+    const s = MAP_STATIONS[key];
     const data = window.STATIONS && window.STATIONS[key];
 
     if (!s || !data) return;
