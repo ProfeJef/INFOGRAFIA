@@ -69,13 +69,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (modalBody) {
       modalBody.className = s.zona ? String(s.zona).toLowerCase() : '';
       modalBody.innerHTML = `
-        <p><strong>Contexto:</strong> ${s.contexto || ''}</p>
-        <p><strong>Enfoque:</strong> ${s.enfoque || ''}</p>
-        <p><strong>Metodología:</strong> ${s.metodologia || ''}</p>
-        <p><strong>TIC:</strong> ${s.tics || ''}</p>
-        <p><strong>Aportes:</strong> ${s.aportes || ''}</p>
-        ${s.fuente ? `<p><a href="${s.fuente}" target="_blank" rel="noopener noreferrer">Ver fuente</a></p>` : ''}
-      `;
+  ${s.imagen ? `<img src="${s.imagen}" alt="${s.nombre || 'Imagen del día'}" class="stationImage">` : ''}
+  <p><strong>Contexto:</strong> ${s.contexto || ''}</p>
+  <p><strong>Enfoque:</strong> ${s.enfoque || ''}</p>
+  <p><strong>Metodología:</strong> ${s.metodologia || ''}</p>
+  <p><strong>TIC:</strong> ${s.tics || ''}</p>
+  <p><strong>Aportes:</strong> ${s.aportes || ''}</p>
+  ${s.fuente ? `<p><a href="${s.fuente}" target="_blank" rel="noopener noreferrer">Ver fuente</a></p>` : ''}
+`;
     }
 
     if (modalOverlay) modalOverlay.style.display = 'flex';
