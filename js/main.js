@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function openStation(key) {
-    if (!window.STATIONS || !STATIONS[key]) return;
+    if (typeof STATIONS === 'undefined' || !STATIONS[key]) return;
 
     const s = STATIONS[key];
     visited.add(key);
