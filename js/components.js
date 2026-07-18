@@ -1,8 +1,4 @@
-// components.js — fondo panorámico fijo + avatar siguiendo la línea negra del sendero
-const TILE = 32;
-const COLS = 32;
-const ROWS = 18;
-
+// components.js — fondo 1024x576 + avatar siguiendo el sendero de izquierda a derecha
 const GAME = {
   width: 1024,
   height: 576
@@ -18,8 +14,8 @@ const ASSETS = {
   viernes: new Image()
 };
 
-// Rutas de imágenes
-ASSETS.background.src = 'assets/FONDO-INFOGRAFÍA.png';
+// Usa aquí la versión 1024x576 del fondo
+ASSETS.background.src = 'assets/FONDO-INFOGRAFIA.png';
 ASSETS.avatar.src = 'assets/avatar-1.png';
 ASSETS.lunes.src = 'assets/lunes-1.png';
 ASSETS.martes.src = 'assets/martes-1.png';
@@ -27,13 +23,21 @@ ASSETS.miercoles.src = 'assets/miercoles-1.png';
 ASSETS.jueves.src = 'assets/jueves-1.png';
 ASSETS.viernes.src = 'assets/viernes-1.png';
 
-// Estaciones colocadas sobre la línea negra del sendero
+// Coordenadas del sendero y estaciones en un fondo 1024x576
+// AJUSTA ESTOS NÚMEROS una vez tengas el PNG final a 1024x576.
+const PATH = {
+  startX: 180,  // donde entra el avatar al camino
+  y: 410,       // altura del sendero
+  minX: 180,
+  maxX: 900
+};
+
 const MAP_STATIONS = {
-  d1: { x: 270, y: 410, r: 30, label: 'LUNES', image: 'lunes' },
-  d2: { x: 420, y: 410, r: 30, label: 'MARTES', image: 'martes' },
-  d3: { x: 575, y: 410, r: 30, label: 'MIERCOLES', image: 'miercoles' },
-  d4: { x: 730, y: 410, r: 30, label: 'JUEVES', image: 'jueves' },
-  d5: { x: 885, y: 410, r: 30, label: 'VIERNES', image: 'viernes' }
+  d1: { x: 270, y: PATH.y, r: 30, label: 'LUNES', image: 'lunes' },
+  d2: { x: 420, y: PATH.y, r: 30, label: 'MARTES', image: 'martes' },
+  d3: { x: 575, y: PATH.y, r: 30, label: 'MIERCOLES', image: 'miercoles' },
+  d4: { x: 730, y: PATH.y, r: 30, label: 'JUEVES', image: 'jueves' },
+  d5: { x: 885, y: PATH.y, r: 30, label: 'VIERNES', image: 'viernes' }
 };
 
 function isAssetReady(img) {
@@ -51,7 +55,7 @@ function drawBackground(ctx) {
 
 function drawAvatar(ctx, player) {
   if (isAssetReady(ASSETS.avatar)) {
-    const w = 64;  // tamaño visual del avatar
+    const w = 64;
     const h = 88;
     ctx.drawImage(ASSETS.avatar, player.x - w / 2, player.y - h + 6, w, h);
   } else {
@@ -109,10 +113,7 @@ function getNearbyStation(player) {
     const dx = player.x - s.x;
     const dy = player.y - s.y;
     const dist = Math.hypot(dx, dy);
-
-    if (dist <= s.r) {
-      return { key, ...s };
-    }
+    if (dist <= s.r) return { key, ...s };
   }
   return null;
 }
@@ -124,27 +125,18 @@ function drawScene(ctx, player) {
 
   for (const key in MAP_STATIONS) {
     const station = MAP_STATIONS[key];
-    const active = nearby && nearby.key === key;
-    drawStationGlow(ctx, station, active);
+    drawStationGlow(ctx, station, nearby && nearby.key === key);
   }
 
   drawAvatar(ctx, player);
   drawStationHint(ctx, player);
 }
 
-// Limitar el movimiento al trazado de la línea negra
+// El avatar sólo recorre el sendero horizontal
 function clampPlayerToPath(player) {
-  // Tramo horizontal de la línea en el fondo escalado
-  const minX = 185;   // entrada al camino desde la plataforma del avatar
-  const maxX = 910;   // casi el final del sendero
+  player.x = Math.max(PATH.minX, Math.min(PATH.maxX, player.x));
 
-  const pathY = 410;  // altura media de la línea negra
-
-  // Limitar X al tramo del sendero
-  player.x = Math.max(minX, Math.min(maxX, player.x));
-
-  // Forzar Y muy cerca de la línea (ligero margen)
-  const minY = pathY - 4;
-  const maxY = pathY + 4;
+  const minY = PATH.y - 4;
+  const maxY = PATH.y + 4;
   player.y = Math.max(minY, Math.min(maxY, player.y));
 }
