@@ -1,4 +1,3 @@
-// components.js — fondo 1024x576 + avatar siguiendo el sendero de izquierda a derecha
 const GAME = {
   width: 1024,
   height: 576
@@ -6,38 +5,35 @@ const GAME = {
 
 const ASSETS = {
   background: new Image(),
-  avatar: new Image(),
-  lunes: new Image(),
-  martes: new Image(),
-  miercoles: new Image(),
-  jueves: new Image(),
-  viernes: new Image()
+  avatar: new Image()
 };
 
-// Usa aquí la versión 1024x576 del fondo
 ASSETS.background.src = 'assets/FONDO-INFOGRAFÍA.png';
 ASSETS.avatar.src = 'assets/avatar-1.png';
-ASSETS.lunes.src = 'assets/lunes-1.png';
-ASSETS.martes.src = 'assets/martes-1.png';
-ASSETS.miercoles.src = 'assets/miercoles-1.png';
-ASSETS.jueves.src = 'assets/jueves-1.png';
-ASSETS.viernes.src = 'assets/viernes-1.png';
 
-// Coordenadas del sendero y estaciones en un fondo 1024x576
-// AJUSTA ESTOS NÚMEROS una vez tengas el PNG final a 1024x576.
 const PATH = {
-  startX: 180,  // donde entra el avatar al camino
-  y: 410,       // altura del sendero
-  minX: 180,
-  maxX: 900
+  startX: 60,
+  y: 445,
+  minX: 60,
+  maxX: 1005,
+  exitX: 1015,
+  exitY: 445
 };
 
 const MAP_STATIONS = {
-  d1: { x: 270, y: PATH.y, r: 30, label: 'LUNES', image: 'lunes' },
-  d2: { x: 420, y: PATH.y, r: 30, label: 'MARTES', image: 'martes' },
-  d3: { x: 575, y: PATH.y, r: 30, label: 'MIERCOLES', image: 'miercoles' },
-  d4: { x: 730, y: PATH.y, r: 30, label: 'JUEVES', image: 'jueves' },
-  d5: { x: 885, y: PATH.y, r: 30, label: 'VIERNES', image: 'viernes' }
+  d1: { x: 177, y: 400, r: 34, label: 'LUNES' },
+  d2: { x: 345, y: 400, r: 34, label: 'MARTES' },
+  d3: { x: 518, y: 400, r: 34, label: 'MIERCOLES' },
+  d4: { x: 645, y: 400, r: 34, label: 'JUEVES' },
+  d5: { x: 872, y: 400, r: 34, label: 'VIERNES' }
+};
+
+const EXIT_POINT = {
+  key: 'exit',
+  x: 1015,
+  y: 445,
+  r: 26,
+  label: 'SALIR'
 };
 
 function isAssetReady(img) {
@@ -64,45 +60,20 @@ function drawAvatar(ctx, player) {
   }
 }
 
-function drawStationGlow(ctx, station, active = false) {
+function drawPointGlow(ctx, x, y, r, active = false, color = '255,255,180') {
   ctx.save();
 
-  const radius = active ? station.r + 10 : station.r - 6;
+  const radius = active ? r + 10 : r - 8;
   const alpha = active ? 0.35 : 0.12;
 
-  const gradient = ctx.createRadialGradient(
-    station.x, station.y, 6,
-    station.x, station.y, radius
-  );
-
-  gradient.addColorStop(0, `rgba(255,255,180,${alpha})`);
-  gradient.addColorStop(1, 'rgba(255,255,180,0)');
+  const gradient = ctx.createRadialGradient(x, y, 6, x, y, radius);
+  gradient.addColorStop(0, `rgba(${color},${alpha})`);
+  gradient.addColorStop(1, `rgba(${color},0)`);
 
   ctx.fillStyle = gradient;
   ctx.beginPath();
-  ctx.arc(station.x, station.y, radius, 0, Math.PI * 2);
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
   ctx.fill();
-
-  ctx.restore();
-}
-
-function drawStationHint(ctx, player) {
-  const station = getNearbyStation(player);
-  if (!station) return;
-
-  ctx.save();
-
-  ctx.fillStyle = 'rgba(0,0,0,0.84)';
-  ctx.fillRect(player.x - 50, player.y - 96, 100, 30);
-
-  ctx.strokeStyle = '#ffffff';
-  ctx.lineWidth = 2;
-  ctx.strokeRect(player.x - 50, player.y - 96, 100, 30);
-
-  ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 18px VT323, monospace';
-  ctx.textAlign = 'center';
-  ctx.fillText('Presiona E', player.x, player.y - 76);
 
   ctx.restore();
 }
@@ -118,25 +89,65 @@ function getNearbyStation(player) {
   return null;
 }
 
+function getNearbyExit(player) {
+  const dx = player.x - EXIT_POINT.x;
+  const dy = player.y - EXIT_POINT.y;
+  const dist = Math.hypot(dx, dy);
+  if (dist <= EXIT_POINT.r) return EXIT_POINT;
+  return null;
+}
+
+function drawHint(ctx, x, y, text) {
+  ctx.save();
+
+  const width = 120;
+  const height = 30;
+
+  ctx.fillStyle = 'rgba(0,0,0,0.84)';
+  ctx.fillRect(x - width / 2, y - 96, width, height);
+
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(x - width / 2, y - 96, width, height);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 18px VT323, monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText(text, x, y - 76);
+
+  ctx.restore();
+}
+
 function drawScene(ctx, player) {
   drawBackground(ctx);
 
   const nearby = getNearbyStation(player);
+  const nearExit = getNearbyExit(player);
 
   for (const key in MAP_STATIONS) {
     const station = MAP_STATIONS[key];
-    drawStationGlow(ctx, station, nearby && nearby.key === key);
+    drawPointGlow(ctx, station.x, station.y, station.r, nearby && nearby.key === key);
   }
 
+  drawPointGlow(
+    ctx,
+    EXIT_POINT.x,
+    EXIT_POINT.y,
+    EXIT_POINT.r,
+    !!nearExit,
+    '255,120,120'
+  );
+
   drawAvatar(ctx, player);
-  drawStationHint(ctx, player);
+
+  if (nearby) {
+    drawHint(ctx, player.x, player.y, 'Presiona E');
+  } else if (nearExit) {
+    drawHint(ctx, player.x, player.y, 'Salir: E');
+  }
 }
 
-// El avatar sólo recorre el sendero horizontal
 function clampPlayerToPath(player) {
   player.x = Math.max(PATH.minX, Math.min(PATH.maxX, player.x));
-
-  const minY = PATH.y - 4;
-  const maxY = PATH.y + 4;
-  player.y = Math.max(minY, Math.min(maxY, player.y));
+  player.y = PATH.y;
 }
