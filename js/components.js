@@ -11,57 +11,33 @@ const ASSETS = {
 ASSETS.background.src = 'assets/FONDO-INFOGRAFÍA.png';
 ASSETS.avatar.src = 'assets/avatar-1.png';
 
-const PATH_POINTS = [
-  { x: 60,  y: 445 },
+const MAIN_PATH = {
+  minX: 60,
+  maxX: 1015,
+  y: 445
+};
 
-  { x: 120, y: 445 },
-  { x: 150, y: 442 },
-  { x: 168, y: 430 },
-  { x: 177, y: 400 },
-  { x: 177, y: 445 },
-
-  { x: 250, y: 445 },
-  { x: 300, y: 442 },
-  { x: 332, y: 438 },
-  { x: 345, y: 400 },
-  { x: 345, y: 445 },
-
-  { x: 430, y: 445 },
-  { x: 470, y: 442 },
-  { x: 505, y: 440 },
-  { x: 518, y: 400 },
-  { x: 518, y: 445 },
-
-  { x: 575, y: 445 },
-  { x: 618, y: 442 },
-  { x: 635, y: 435 },
-  { x: 645, y: 400 },
-  { x: 645, y: 445 },
-
-  { x: 730, y: 445 },
-  { x: 790, y: 442 },
-  { x: 850, y: 438 },
-  { x: 872, y: 400 },
-  { x: 872, y: 445 },
-
-  { x: 940, y: 445 },
-  { x: 1005, y: 445 },
-  { x: 1015, y: 445 }
-];
+const BRANCHES = {
+  d1: { x: 177, topY: 400, baseY: 445 },
+  d2: { x: 345, topY: 400, baseY: 445 },
+  d3: { x: 518, topY: 400, baseY: 445 },
+  d4: { x: 695, topY: 400, baseY: 445 },
+  d5: { x: 872, topY: 400, baseY: 445 }
+};
 
 const MAP_STATIONS = {
-  d1: { x: 177, y: 400, r: 26, label: 'LUNES' },
-  d2: { x: 345, y: 400, r: 26, label: 'MARTES' },
-  d3: { x: 518, y: 400, r: 26, label: 'MIERCOLES' },
-  d4: { x: 645, y: 400, r: 26, label: 'JUEVES' },
-  d5: { x: 872, y: 400, r: 26, label: 'VIERNES' }
+  d1: { x: 177, y: 400, r: 38, label: 'LUNES' },
+  d2: { x: 345, y: 400, r: 38, label: 'MARTES' },
+  d3: { x: 518, y: 400, r: 38, label: 'MIERCOLES' },
+  d4: { x: 695, y: 400, r: 38, label: 'JUEVES' },
+  d5: { x: 872, y: 400, r: 38, label: 'VIERNES' }
 };
 
 const EXIT_POINT = {
   key: 'exit',
   x: 1015,
   y: 445,
-  r: 24,
+  r: 28,
   label: 'SALIR'
 };
 
@@ -103,39 +79,12 @@ function drawPointGlow(ctx, x, y, r, active = false, color = '255,255,180') {
   ctx.restore();
 }
 
-function projectPointToSegment(px, py, ax, ay, bx, by) {
-  const abx = bx - ax;
-  const aby = by - ay;
-  const ab2 = abx * abx + aby * aby;
-  if (ab2 === 0) return { x: ax, y: ay, t: 0, dist: Math.hypot(px - ax, py - ay) };
-
-  let t = ((px - ax) * abx + (py - ay) * aby) / ab2;
-  t = Math.max(0, Math.min(1, t));
-
-  const x = ax + abx * t;
-  const y = ay + aby * t;
-  const dist = Math.hypot(px - x, py - y);
-
-  return { x, y, t, dist };
-}
-
-function clampPlayerToPath(player) {
-  let best = null;
-
-  for (let i = 0; i < PATH_POINTS.length - 1; i++) {
-    const a = PATH_POINTS[i];
-    const b = PATH_POINTS[i + 1];
-    const p = projectPointToSegment(player.x, player.y, a.x, a.y, b.x, b.y);
-
-    if (!best || p.dist < best.dist) {
-      best = p;
-    }
+function getNearestBranch(player, tolerance = 22) {
+  for (const key in BRANCHES) {
+    const b = BRANCHES[key];
+    if (Math.abs(player.x - b.x) <= tolerance) return { key, ...b };
   }
-
-  if (best) {
-    player.x = best.x;
-    player.y = best.y;
-  }
+  return null;
 }
 
 function getNearbyStation(player) {
@@ -166,6 +115,19 @@ function drawHint(ctx, x, y, text) {
   ctx.restore();
 }
 
+function clampPlayerToWalkable(player) {
+  const branch = getNearestBranch(player, 14);
+
+  if (branch && Math.abs(player.y - branch.topY) < Math.abs(player.y - branch.baseY)) {
+    player.x = branch.x;
+    player.y = Math.max(branch.topY, Math.min(branch.baseY, player.y));
+    return;
+  }
+
+  player.x = Math.max(MAIN_PATH.minX, Math.min(MAIN_PATH.maxX, player.x));
+  player.y = MAIN_PATH.y;
+}
+
 function drawScene(ctx, player) {
   drawBackground(ctx);
 
@@ -178,6 +140,7 @@ function drawScene(ctx, player) {
   }
 
   drawPointGlow(ctx, EXIT_POINT.x, EXIT_POINT.y, EXIT_POINT.r, !!nearExit, '255,120,120');
+
   drawAvatar(ctx, player);
 
   if (nearby) drawHint(ctx, player.x, player.y, 'Presiona E');
