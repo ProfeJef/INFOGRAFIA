@@ -19,7 +19,7 @@ const ASSETS = {
 };
 
 // Cambia .png por los nombres exactos que tengas en tu carpeta assets
-ASSETS.background.src = 'assets/FONDO-INFOGRAFIA.png';
+ASSETS.background.src = 'assets/FONDO-INFOGRAFíA.png';
 ASSETS.avatar.src = 'assets/avatar-1.png';
 ASSETS.lunes.src = 'assets/lunes-1.png';
 ASSETS.martes.src = 'assets/martes-1.png';
