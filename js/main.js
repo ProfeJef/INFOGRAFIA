@@ -21,13 +21,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const visited = new Set();
 
   const player = {
-  x: 60,
-  y: 445,
-  speed: 3
-};
+    x: MAIN_PATH.minX,
+    y: MAIN_PATH.y,
+    speed: 3
+  };
 
   const keys = {};
-  let lastInteractionKey = null;
   let started = false;
 
   function updateHud() {
@@ -37,14 +36,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (progressFill) progressFill.style.width = pct + '%';
     if (progressText) progressText.textContent = `${done}/${total} días`;
-
     if (aseBar) aseBar.style.width = pct + '%';
     if (weekBar) weekBar.style.width = pct + '%';
     if (flowBar) flowBar.style.width = pct + '%';
-
     if (asePct) asePct.textContent = pct + '%';
     if (weekPct) weekPct.textContent = pct + '%';
     if (flowPct) flowPct.textContent = pct + '%';
+  }
+
+  function closeModal() {
+    const modal = document.getElementById('modalOverlay');
+    if (modal) modal.style.display = 'none';
+  }
+
+  function resetGame() {
+    visited.clear();
+    updateHud();
+    closeModal();
+    player.x = MAIN_PATH.minX;
+    player.y = MAIN_PATH.y;
+    started = false;
+    if (welcomeOverlay) welcomeOverlay.style.display = 'flex';
   }
 
   function openStation(key) {
@@ -57,12 +69,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const tag = document.getElementById('modalTag');
     const title = document.getElementById('modalTitle');
     const body = document.getElementById('modalBody');
+    const modal = document.getElementById('modalOverlay');
 
     if (tag) tag.textContent = s.zona || 'DÍA';
     if (title) title.textContent = s.nombre || '';
     if (!body) return;
 
-    body.className = s.zona ? String(s.zona).toLowerCase() : '';
     body.innerHTML = `
       <p><strong>Contexto:</strong> ${s.contexto || ''}</p>
       <p><strong>Enfoque:</strong> ${s.enfoque || ''}</p>
@@ -72,57 +84,62 @@ document.addEventListener('DOMContentLoaded', () => {
       ${s.fuente ? `<p><a href="${s.fuente}" target="_blank" rel="noopener noreferrer">Ver fuente</a></p>` : ''}
     `;
 
-    const modal = document.getElementById('modalOverlay');
     if (modal) modal.style.display = 'flex';
-  }
-
-  function closeModal() {
-    const modal = document.getElementById('modalOverlay');
-    if (modal) modal.style.display = 'none';
   }
 
   function updateMovement() {
     if (!started) return;
 
-    let dx = 0;
-    let dy = 0;
+    const branch = getNearestBranch(player, 16);
+    const onBranch = branch && Math.abs(player.x - branch.x) < 1 && player.y < branch.baseY + 0.5;
 
-    if (keys['arrowleft'] || keys['a']) dx -= player.speed;
-    if (keys['arrowright'] || keys['d']) dx += player.speed;
-    if (keys['arrowup'] || keys['w']) dy -= player.speed;
-    if (keys['arrowdown'] || keys['s']) dy += player.speed;
-
-    player.x += dx;
-    player.y += dy;
-
-    clampPlayerToPath(player);
-  }
-
-  function updateInteraction() {
-    if (!started) return;
-
-    const nearby = getNearbyStation(player);
-
-    if (keys['e']) {
-      if (nearby && lastInteractionKey !== nearby.key) {
-        openStation(nearby.key);
-        lastInteractionKey = nearby.key;
+    if (onBranch) {
+      if (keys['arrowup'] || keys['w']) player.y -= player.speed;
+      if (keys['arrowdown'] || keys['s']) player.y += player.speed;
+      if (keys['arrowleft'] || keys['a']) {
+        player.y = branch.baseY;
+        player.x -= player.speed;
+      }
+      if (keys['arrowright'] || keys['d']) {
+        player.y = branch.baseY;
+        player.x += player.speed;
       }
     } else {
-      lastInteractionKey = null;
+      if (keys['arrowleft'] || keys['a']) player.x -= player.speed;
+      if (keys['arrowright'] || keys['d']) player.x += player.speed;
+
+      if ((keys['arrowup'] || keys['w']) && branch) {
+        player.x = branch.x;
+        player.y -= player.speed;
+      }
+
+      if (keys['arrowdown'] || keys['s']) {
+        player.y = MAIN_PATH.y;
+      }
     }
+
+    clampPlayerToWalkable(player);
   }
 
   function loop() {
     drawScene(ctx, player);
     updateMovement();
-    updateInteraction();
     requestAnimationFrame(loop);
   }
 
   window.addEventListener('keydown', (e) => {
-    keys[e.key.toLowerCase()] = true;
-    if (e.key === 'Escape') closeModal();
+    const key = e.key.toLowerCase();
+    keys[key] = true;
+
+    if (key === 'escape') closeModal();
+
+    if (key === 'e' && !e.repeat) {
+      const nearby = getNearbyStation(player);
+      const nearExit = getNearbyExit(player);
+
+      if (nearby) openStation(nearby.key);
+      else if (nearExit) resetGame();
+    }
   });
 
   window.addEventListener('keyup', (e) => {
@@ -152,9 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   updateHud();
 
-  if (loadingEl) {
-    loadingEl.style.display = 'none';
-  }
+  if (loadingEl) loadingEl.style.display = 'none';
 
   loop();
 });
