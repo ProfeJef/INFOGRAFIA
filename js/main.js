@@ -1,4 +1,4 @@
-// main.js — Recorrido interactivo sobre fondo panorámico fijo
+// main.js — recorrido interactivo sobre fondo panorámico fijo
 document.addEventListener('DOMContentLoaded', () => {
   const canvas = document.getElementById('game');
   const ctx = canvas.getContext('2d');
@@ -9,12 +9,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const visited = new Set();
 
   const player = {
-    x: 95,
-    y: 430,
-    speed: 3.2
+    x: 150,
+    y: 390,
+    speed: 3
   };
 
-  let transitioning = true;
+  let started = false;
 
   const startBtn = document.getElementById('startBtn');
   const welcomeOverlay = document.getElementById('welcomeOverlay');
@@ -22,21 +22,26 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeBtn = document.getElementById('closeBtn');
   const loading = document.getElementById('loading');
 
+  const keys = {};
+  const NAV_KEYS = ['arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'w', 'a', 's', 'd', 'e', ' '];
+
   if (startBtn) {
     startBtn.addEventListener('click', () => {
       welcomeOverlay.style.display = 'none';
-      transitioning = false;
+      started = true;
     });
+  } else {
+    started = true;
   }
-
-  const keys = {};
-  const NAV_KEYS = ['arrowup','arrowdown','arrowleft','arrowright',' ','w','a','s','d','e'];
 
   window.addEventListener('keydown', e => {
     const k = e.key.toLowerCase();
     if (NAV_KEYS.includes(k)) e.preventDefault();
     keys[k] = true;
-    if (k === 'e') interact();
+
+    if (k === 'e') {
+      interact();
+    }
   }, { passive: false });
 
   window.addEventListener('keyup', e => {
@@ -47,26 +52,38 @@ document.addEventListener('DOMContentLoaded', () => {
     for (const k in keys) keys[k] = false;
   });
 
-  function openStation(key) {
-    const s = MAP_STATIONS[key];
-    const data = window.STATIONS && window.STATIONS[key];
+  function interact() {
+    const station = getNearbyStation(player);
+    if (station) {
+      openStation(station.key);
+    }
+  }
 
-    if (!s || !data) return;
+  function openStation(key) {
+    const mapInfo = MAP_STATIONS[key];
+    const data = typeof STATIONS !== 'undefined' ? STATIONS[key] : null;
+
+    if (!mapInfo || !data) return;
 
     const modalTag = document.getElementById('modalTag');
     const modalTitle = document.getElementById('modalTitle');
     const modalBody = document.getElementById('modalBody');
 
-    if (modalTag) modalTag.textContent = data.zona ? data.zona.toUpperCase() : s.label;
-    if (modalTitle) modalTitle.textContent = data.nombre || s.label;
+    if (modalTag) {
+      modalTag.textContent = data.zona ? data.zona.toUpperCase() : mapInfo.label;
+    }
+
+    if (modalTitle) {
+      modalTitle.textContent = data.nombre || mapInfo.label;
+    }
 
     let extraImage = '';
-    if (ASSETS[s.image] && ASSETS[s.image].src) {
+    if (ASSETS[mapInfo.image] && ASSETS[mapInfo.image].src) {
       extraImage = `
         <div style="margin:0 0 14px 0;">
-          <img 
-            src="${ASSETS[s.image].src}" 
-            alt="${data.nombre || s.label}" 
+          <img
+            src="${ASSETS[mapInfo.image].src}"
+            alt="${data.nombre || mapInfo.label}"
             style="width:100%; max-width:360px; display:block; margin:0 auto; border-radius:12px; border:3px solid #5d3a1a;"
           >
         </div>
@@ -85,21 +102,26 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
     }
 
-    modalOverlay.style.display = 'flex';
+    if (modalOverlay) {
+      modalOverlay.style.display = 'flex';
+    }
+
     visited.add(key);
     updateProgress();
     updateBars();
   }
 
   function closeModal() {
-    modalOverlay.style.display = 'none';
+    if (modalOverlay) modalOverlay.style.display = 'none';
   }
 
-  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeModal);
+  }
 
   if (modalOverlay) {
     modalOverlay.addEventListener('click', e => {
-      if (e.target.id === 'modalOverlay') closeModal();
+      if (e.target === modalOverlay) closeModal();
     });
   }
 
@@ -107,43 +129,37 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Escape') closeModal();
   });
 
-  function interact() {
-    const station = getNearbyStation(player);
-    if (station) openStation(station.key);
-  }
-
   function updateProgress() {
     const fill = document.getElementById('progressFill');
     const text = document.getElementById('progressText');
-    if (!fill || !text) return;
-
     const total = 5;
     const pct = (visited.size / total) * 100;
 
-    fill.style.width = pct + '%';
-    text.textContent = `${visited.size}/${total} dias`;
+    if (fill) fill.style.width = pct + '%';
+    if (text) text.textContent = `${visited.size}/${total} dias`;
   }
 
   function updateBars() {
     const aseBar = document.getElementById('aseBar');
-    const asePctEl = document.getElementById('asePct');
+    const asePct = document.getElementById('asePct');
     const weekBar = document.getElementById('weekBar');
-    const weekPctEl = document.getElementById('weekPct');
+    const weekPct = document.getElementById('weekPct');
     const flowBar = document.getElementById('flowBar');
-    const flowPctEl = document.getElementById('flowPct');
+    const flowPct = document.getElementById('flowPct');
 
-    const asePct = Math.min(100, visited.size * 20);
-    if (aseBar) aseBar.style.width = asePct + '%';
-    if (asePctEl) asePctEl.textContent = asePct + '%';
+    const totalVisited = visited.size;
+    const aseValue = Math.min(100, totalVisited * 20);
+    const weekValue = Math.min(100, totalVisited * 20);
+    const flowValue = totalVisited >= 5 ? 100 : Math.min(100, totalVisited * 20);
 
-    const weekDays = ['d1','d2','d3','d4','d5'].filter(d => visited.has(d)).length;
-    const weekPct = Math.round((weekDays / 5) * 100);
-    if (weekBar) weekBar.style.width = weekPct + '%';
-    if (weekPctEl) weekPctEl.textContent = weekPct + '%';
+    if (aseBar) aseBar.style.width = aseValue + '%';
+    if (asePct) asePct.textContent = aseValue + '%';
 
-    const flowPct = visited.has('d5') ? 100 : Math.min(80, visited.size * 16);
-    if (flowBar) flowBar.style.width = flowPct + '%';
-    if (flowPctEl) flowPctEl.textContent = flowPct + '%';
+    if (weekBar) weekBar.style.width = weekValue + '%';
+    if (weekPct) weekPct.textContent = weekValue + '%';
+
+    if (flowBar) flowBar.style.width = flowValue + '%';
+    if (flowPct) flowPct.textContent = flowValue + '%';
   }
 
   const joystickZone = document.getElementById('joystickZone');
@@ -194,16 +210,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const endTouch = e => {
       baseRect = null;
       touchDir = null;
+
       if (joystickStick) {
         joystickStick.style.left = '31px';
         joystickStick.style.top = '31px';
       }
+
       if (e) e.preventDefault();
     };
 
-    joystickZone.addEventListener('touchstart', startTouch, { passive:false });
-    joystickZone.addEventListener('touchmove', moveTouch, { passive:false });
-    joystickZone.addEventListener('touchend', endTouch, { passive:false });
+    joystickZone.addEventListener('touchstart', startTouch, { passive: false });
+    joystickZone.addEventListener('touchmove', moveTouch, { passive: false });
+    joystickZone.addEventListener('touchend', endTouch, { passive: false });
     joystickZone.addEventListener('mousedown', startTouch);
     window.addEventListener('mousemove', e => { if (baseRect) moveTouch(e); });
     window.addEventListener('mouseup', endTouch);
@@ -214,20 +232,22 @@ document.addEventListener('DOMContentLoaded', () => {
       interact();
       if (e) e.preventDefault();
     };
-    btnAction.addEventListener('touchstart', fire, { passive:false });
+
+    btnAction.addEventListener('touchstart', fire, { passive: false });
     btnAction.addEventListener('click', fire);
   }
 
   function handleInput() {
-    if (transitioning) return;
+    if (!started) return;
+    if (modalOverlay && modalOverlay.style.display === 'flex') return;
 
     let dx = 0;
     let dy = 0;
 
-    if (keys['arrowup'] || keys['w'] || touchDir === 'up') dy -= player.speed;
-    if (keys['arrowdown'] || keys['s'] || touchDir === 'down') dy += player.speed;
     if (keys['arrowleft'] || keys['a'] || touchDir === 'left') dx -= player.speed;
     if (keys['arrowright'] || keys['d'] || touchDir === 'right') dx += player.speed;
+    if (keys['arrowup'] || keys['w'] || touchDir === 'up') dy -= player.speed;
+    if (keys['arrowdown'] || keys['s'] || touchDir === 'down') dy += player.speed;
 
     player.x += dx;
     player.y += dy;
