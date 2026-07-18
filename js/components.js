@@ -158,7 +158,7 @@ function drawScene(ctx, player) {
   drawAvatar(ctx, player);
 
   if (nearby) {
-    drawHint(ctx, player.x, player.y, 'Presiona E');
+    drawHint(ctx, player.x, player.y, 'E o tocar');
   } else if (nearExit) {
     drawHint(ctx, player.x, player.y, 'Salir: E');
   }
