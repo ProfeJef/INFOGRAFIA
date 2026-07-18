@@ -18,7 +18,7 @@ const ASSETS = {
   viernes: new Image()
 };
 
-// Cambia .png por los nombres exactos que tengas en tu carpeta assets
+// Rutas reales en tu repo
 ASSETS.background.src = 'assets/FONDO-INFOGRAFIA.png';
 ASSETS.avatar.src = 'assets/avatar-1.png';
 ASSETS.lunes.src = 'assets/lunes-1.png';
@@ -42,7 +42,19 @@ function isAssetReady(img) {
 
 function drawBackground(ctx) {
   if (isAssetReady(ASSETS.background)) {
-    ctx.drawImage(ASSETS.background, 0, 0, GAME.width, GAME.height);
+    const img = ASSETS.background;
+
+    ctx.clearRect(0, 0, GAME.width, GAME.height);
+    ctx.fillStyle = '#8fd6f0';
+    ctx.fillRect(0, 0, GAME.width, GAME.height);
+
+    const scale = Math.min(GAME.width / img.width, GAME.height / img.height);
+    const w = img.width * scale;
+    const h = img.height * scale;
+    const x = (GAME.width - w) / 2;
+    const y = (GAME.height - h) / 2;
+
+    ctx.drawImage(img, x, y, w, h);
   } else {
     ctx.fillStyle = '#8fd6f0';
     ctx.fillRect(0, 0, GAME.width, GAME.height);
@@ -114,9 +126,11 @@ function getNearbyStation(player) {
 function drawScene(ctx, player) {
   drawBackground(ctx);
 
+  const nearby = getNearbyStation(player);
+
   for (const key in MAP_STATIONS) {
     const station = MAP_STATIONS[key];
-    const active = !!getNearbyStation(player) && getNearbyStation(player).key === key;
+    const active = nearby && nearby.key === key;
     drawStationGlow(ctx, station, active);
   }
 
