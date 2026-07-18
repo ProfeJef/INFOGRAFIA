@@ -24,7 +24,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const joystickZone = document.getElementById('joystickZone');
   const joystickStick = document.getElementById('joystickStick');
   const btnAction = document.getElementById('btnAction');
+
   const btnRotate = document.getElementById('btnRotate');
+  const btnBack = document.getElementById('btnBack');
   const rotateHint = document.getElementById('rotateHint');
   const rotateNowBtn = document.getElementById('rotateNowBtn');
   const rotateCloseBtn = document.getElementById('rotateCloseBtn');
@@ -34,22 +36,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const visited = new Set();
   const keys = {};
-
-  const touchInput = {
-    dx: 0,
-    dy: 0,
-    active: false
-  };
-
   let started = false;
   let rotateDismissed = false;
-  let joystickPointerId = null;
 
   const player = {
     x: MAIN_PATH.minX,
     y: MAIN_PATH.y,
     speed: 3
   };
+
+  let moveVec = { x: 0, y: 0 };
+  let joystickActive = false;
+
+  function isMobileLike() {
+    return window.matchMedia('(max-width: 900px)').matches;
+  }
 
   function updateHud() {
     const total = Object.keys(MAP_STATIONS).length;
@@ -96,6 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (modalOverlay) modalOverlay.style.display = 'flex';
+    updateRotateHint();
   }
 
   function resetGame() {
@@ -106,13 +108,16 @@ document.addEventListener('DOMContentLoaded', () => {
     player.x = MAIN_PATH.minX;
     player.y = MAIN_PATH.y;
 
-    started = false;
-    touchInput.dx = 0;
-    touchInput.dy = 0;
-    touchInput.active = false;
+    moveVec.x = 0;
+    moveVec.y = 0;
+    joystickActive = false;
     centerStick();
 
+    started = false;
+    rotateDismissed = false;
+
     if (welcomeOverlay) welcomeOverlay.style.display = 'flex';
+    updateRotateHint();
   }
 
   function interact() {
@@ -126,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function getInputVector() {
+  function getKeyboardVector() {
     let dx = 0;
     let dy = 0;
 
@@ -135,8 +140,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (keys['arrowup'] || keys['w']) dy -= 1;
     if (keys['arrowdown'] || keys['s']) dy += 1;
 
-    dx += touchInput.dx;
-    dy += touchInput.dy;
+    return { dx, dy };
+  }
+
+  function getInputVector() {
+    const kb = getKeyboardVector();
+    let dx = kb.dx + moveVec.x;
+    let dy = kb.dy + moveVec.y;
 
     dx = Math.max(-1, Math.min(1, dx));
     dy = Math.max(-1, Math.min(1, dy));
@@ -203,7 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
     joystickStick.style.top = '31px';
   }
 
-  function updateStick(clientX, clientY) {
+  function updateJoystick(clientX, clientY) {
     if (!joystickZone || !joystickStick) return;
 
     const rect = joystickZone.getBoundingClientRect();
@@ -213,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let dx = clientX - cx;
     let dy = clientY - cy;
 
-    const max = rect.width * 0.34;
+    const max = rect.width / 2 - 16;
     const dist = Math.hypot(dx, dy);
 
     if (dist > max) {
@@ -221,61 +231,25 @@ document.addEventListener('DOMContentLoaded', () => {
       dy = (dy / dist) * max;
     }
 
-    joystickStick.style.left = `${31 + dx * 0.6}px`;
-    joystickStick.style.top = `${31 + dy * 0.6}px`;
+    joystickStick.style.left = `${31 + dx}px`;
+    joystickStick.style.top = `${31 + dy}px`;
 
-    touchInput.dx = dx / max;
-    touchInput.dy = dy / max;
-    touchInput.active = true;
+    moveVec.x = dx / max;
+    moveVec.y = dy / max;
+    joystickActive = true;
   }
 
-  function endStick() {
-    joystickPointerId = null;
-    touchInput.dx = 0;
-    touchInput.dy = 0;
-    touchInput.active = false;
+  function endJoystick() {
+    moveVec.x = 0;
+    moveVec.y = 0;
+    joystickActive = false;
     centerStick();
   }
 
-  function canvasToGame(clientX, clientY) {
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-
-    return {
-      x: (clientX - rect.left) * scaleX,
-      y: (clientY - rect.top) * scaleY
-    };
-  }
-
-  function getTappedStation(point) {
-    let best = null;
-
-    for (const key in MAP_STATIONS) {
-      const s = MAP_STATIONS[key];
-      const dist = Math.hypot(point.x - s.x, point.y - s.y);
-
-      if (dist <= s.r + 26 && (!best || dist < best.dist)) {
-        best = { key, ...s, dist };
-      }
-    }
-
-    return best;
-  }
-
-  function movePlayerToStation(key) {
-    const branch = BRANCHES[key];
-    if (!branch) return;
-
-    player.x = branch.x;
-    player.y = branch.topY;
-    clampPlayerToWalkable(player);
-  }
-
   async function requestLandscape() {
-    try {
-      const root = document.documentElement;
+    const root = document.documentElement;
 
+    try {
       if (root.requestFullscreen) {
         await root.requestFullscreen();
       }
@@ -287,17 +261,74 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function isMobile() {
-    return window.matchMedia('(max-width: 768px)').matches;
+  async function exitLandscape() {
+    try {
+      if (screen.orientation && screen.orientation.unlock) {
+        screen.orientation.unlock();
+      }
+    } catch (err) {
+    }
+
+    try {
+      if (document.fullscreenElement && document.exitFullscreen) {
+        await document.exitFullscreen();
+      }
+    } catch (err) {
+    }
+
+    rotateDismissed = false;
+    updateRotateHint();
   }
 
   function updateRotateHint() {
-    if (!rotateHint || rotateDismissed || !isMobile()) return;
+    if (!rotateHint || !isMobileLike()) return;
 
     const portrait = window.matchMedia('(orientation: portrait)').matches;
     const modalOpen = modalOverlay && modalOverlay.style.display === 'flex';
 
-    rotateHint.classList.toggle('show', portrait && started && !modalOpen);
+    const shouldShow =
+      started &&
+      portrait &&
+      !modalOpen &&
+      !rotateDismissed;
+
+    rotateHint.classList.toggle('show', !!shouldShow);
+  }
+
+  function canvasPointToGame(clientX, clientY) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    return {
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY
+    };
+  }
+
+  function nearestTappedStation(point) {
+    let best = null;
+
+    for (const key in MAP_STATIONS) {
+      const s = MAP_STATIONS[key];
+      const dist = Math.hypot(point.x - s.x, point.y - s.y);
+
+      if (dist <= 70 && (!best || dist < best.dist)) {
+        best = { key, ...s, dist };
+      }
+    }
+
+    return best;
+  }
+
+  function movePlayerNearStation(key) {
+    const station = MAP_STATIONS[key];
+    const branch = BRANCHES[key];
+    if (!station || !branch) return;
+
+    player.x = branch.x;
+    player.y = branch.topY;
+    clampPlayerToWalkable(player);
   }
 
   window.addEventListener('keydown', (e) => {
@@ -317,7 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.addEventListener('blur', () => {
     for (const k in keys) keys[k] = false;
-    endStick();
+    endJoystick();
   });
 
   if (closeBtn) {
@@ -346,18 +377,24 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (btnRotate) {
-    btnRotate.addEventListener('click', () => {
+    btnRotate.addEventListener('click', async () => {
       rotateDismissed = true;
       if (rotateHint) rotateHint.classList.remove('show');
-      requestLandscape();
+      await requestLandscape();
+    });
+  }
+
+  if (btnBack) {
+    btnBack.addEventListener('click', async () => {
+      await exitLandscape();
     });
   }
 
   if (rotateNowBtn) {
-    rotateNowBtn.addEventListener('click', () => {
+    rotateNowBtn.addEventListener('click', async () => {
       rotateDismissed = true;
       if (rotateHint) rotateHint.classList.remove('show');
-      requestLandscape();
+      await requestLandscape();
     });
   }
 
@@ -369,41 +406,61 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (joystickZone) {
+    let dragging = false;
+
+    const start = (clientX, clientY) => {
+      dragging = true;
+      updateJoystick(clientX, clientY);
+    };
+
+    const move = (clientX, clientY) => {
+      if (!dragging) return;
+      updateJoystick(clientX, clientY);
+    };
+
+    const end = () => {
+      dragging = false;
+      endJoystick();
+    };
+
     joystickZone.addEventListener('pointerdown', (e) => {
       e.preventDefault();
-      joystickPointerId = e.pointerId;
       joystickZone.setPointerCapture(e.pointerId);
-      updateStick(e.clientX, e.clientY);
+      start(e.clientX, e.clientY);
     });
 
     joystickZone.addEventListener('pointermove', (e) => {
-      if (e.pointerId !== joystickPointerId) return;
-      updateStick(e.clientX, e.clientY);
+      move(e.clientX, e.clientY);
     });
 
-    joystickZone.addEventListener('pointerup', (e) => {
-      if (e.pointerId !== joystickPointerId) return;
-      endStick();
+    joystickZone.addEventListener('pointerup', () => {
+      end();
     });
 
-    joystickZone.addEventListener('pointercancel', endStick);
-    joystickZone.addEventListener('lostpointercapture', endStick);
+    joystickZone.addEventListener('pointercancel', () => {
+      end();
+    });
+
+    joystickZone.addEventListener('lostpointercapture', () => {
+      end();
+    });
   }
 
   canvas.addEventListener('pointerdown', (e) => {
     if (!started) return;
 
-    const point = canvasToGame(e.clientX, e.clientY);
-    const tapped = getTappedStation(point);
+    const point = canvasPointToGame(e.clientX, e.clientY);
+    const tappedStation = nearestTappedStation(point);
 
-    if (tapped) {
-      movePlayerToStation(tapped.key);
+    if (tappedStation) {
+      movePlayerNearStation(tappedStation.key);
       interact();
       return;
     }
 
-    const exitDist = Math.hypot(point.x - EXIT_POINT.x, point.y - EXIT_POINT.y);
-    if (exitDist <= EXIT_POINT.r + 24) {
+    const nearExitTap = Math.hypot(point.x - EXIT_POINT.x, point.y - EXIT_POINT.y) <= 56;
+
+    if (nearExitTap) {
       player.x = EXIT_POINT.x;
       player.y = EXIT_POINT.y;
       interact();
@@ -413,6 +470,10 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('resize', updateRotateHint);
   window.addEventListener('orientationchange', updateRotateHint);
 
+  document.addEventListener('fullscreenchange', () => {
+    updateRotateHint();
+  });
+
   updateHud();
 
   if (loadingEl) {
@@ -420,5 +481,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   centerStick();
+  updateRotateHint();
   loop();
 });
