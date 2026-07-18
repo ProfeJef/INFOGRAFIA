@@ -1,204 +1,360 @@
 document.addEventListener('DOMContentLoaded', () => {
-const canvas = document.getElementById('game');
-const ctx = canvas.getContext('2d');
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
 
-const loadingEl = document.getElementById('loading');
-const welcomeOverlay = document.getElementById('welcomeOverlay');
-const startBtn = document.getElementById('startBtn');
+  canvas.width = GAME.width;
+  canvas.height = GAME.height;
 
-const progressFill = document.getElementById('progressFill');
-const progressText = document.getElementById('progressText');
-const aseBar = document.getElementById('aseBar');
-const weekBar = document.getElementById('weekBar');
-const flowBar = document.getElementById('flowBar');
-const asePct = document.getElementById('asePct');
-const weekPct = document.getElementById('weekPct');
-const flowPct = document.getElementById('flowPct');
+  const player = {
+    x: MAIN_PATH.minX,
+    y: MAIN_PATH.y,
+    speed: 3.2
+  };
 
-const modalOverlay = document.getElementById('modalOverlay');
-const modalTag = document.getElementById('modalTag');
-const modalTitle = document.getElementById('modalTitle');
-const modalBody = document.getElementById('modalBody');
-const closeBtn = document.getElementById('closeBtn');
+  const keys = {};
+  const visited = new Set();
 
-canvas.width = GAME.width;
-canvas.height = GAME.height;
+  const touchInput = {
+    dx: 0,
+    dy: 0,
+    active: false
+  };
 
-const visited = new Set();
-const keys = {};
+  let started = true;
+  let joystickPointerId = null;
+  let rotateDismissed = false;
 
-let started = false;
+  const modalOverlay = document.getElementById('modalOverlay');
+  const modalBody = document.getElementById('modalBody');
+  const closeBtn = document.getElementById('closeBtn');
 
-const player = {
-x: MAIN_PATH.minX,
-y: MAIN_PATH.y,
-speed: 3
-};
+  const interactBtn = document.getElementById('interactBtn');
+  const rotateBtn = document.getElementById('rotateBtn');
+  const rotateHint = document.getElementById('rotateHint');
+  const rotateNowBtn = document.getElementById('rotateNowBtn');
+  const rotateCloseBtn = document.getElementById('rotateCloseBtn');
 
-function updateHud() {
-const total = Object.keys(MAP_STATIONS).length;
-const done = visited.size;
-const pct = total ? Math.round((done / total) * 100) : 0;
+  const joystickBase = document.getElementById('joystickBase');
+  const joystickStick = document.getElementById('joystickStick');
 
-if (progressFill) progressFill.style.width = pct + '%';
-if (progressText) progressText.textContent = `${done}/${total} días`;
+  function openStation(key) {
+    if (!STATIONS[key] || !modalBody) return;
 
-if (aseBar) aseBar.style.width = pct + '%';
-if (weekBar) weekBar.style.width = pct + '%';
-if (flowBar) flowBar.style.width = pct + '%';
+    const s = STATIONS[key];
+    visited.add(key);
 
-if (asePct) asePct.textContent = pct + '%';
-if (weekPct) weekPct.textContent = pct + '%';
-if (flowPct) flowPct.textContent = pct + '%';
-}
+    modalBody.className = (s.zona || '').toLowerCase();
+    modalBody.innerHTML = `
+      <h2>${s.nombre || ''}</h2>
+      ${s.imagen ? `<img src="${s.imagen}" alt="${s.nombre || 'Estación'}" class="stationImage">` : ''}
+      <p><strong>Contexto:</strong> ${s.contexto || ''}</p>
+      <p><strong>Enfoque:</strong> ${s.enfoque || ''}</p>
+      <p><strong>Metodología:</strong> ${s.metodologia || ''}</p>
+      <p><strong>TIC:</strong> ${s.tics || ''}</p>
+      <p><strong>Aportes:</strong> ${s.aportes || ''}</p>
+      ${s.fuente ? `<p><a href="${s.fuente}" target="_blank" rel="noopener noreferrer">Ver fuente</a></p>` : ''}
+    `;
 
-function closeModal() {
-if (modalOverlay) modalOverlay.style.display = 'none';
-}
+    if (modalOverlay) modalOverlay.style.display = 'flex';
+  }
 
-function openStation(key) {
-if (typeof STATIONS === 'undefined' || !STATIONS[key]) return;
+  function closeModal() {
+    if (modalOverlay) modalOverlay.style.display = 'none';
+  }
 
-const s = STATIONS[key];
-visited.add(key);
-updateHud();
+  function resetPlayer() {
+    player.x = MAIN_PATH.minX;
+    player.y = MAIN_PATH.y;
+  }
 
-if (modalTag) modalTag.textContent = s.zona || 'DÍA';
-if (modalTitle) modalTitle.textContent = s.nombre || '';
+  function interact() {
+    const nearby = getNearbyStation(player);
+    const nearExit = getNearbyExit(player);
 
-if (modalBody) {
-modalBody.className = s.zona ? String(s.zona).toLowerCase() : '';
-modalBody.innerHTML = `
-        <p><strong>Contexto:</strong> ${s.contexto || ''}</p>
-        <p><strong>Enfoque:</strong> ${s.enfoque || ''}</p>
-        <p><strong>Metodología:</strong> ${s.metodologia || ''}</p>
-        <p><strong>TIC:</strong> ${s.tics || ''}</p>
-        <p><strong>Aportes:</strong> ${s.aportes || ''}</p>
-        ${s.fuente ? `<p><a href="${s.fuente}" target="_blank" rel="noopener noreferrer">Ver fuente</a></p>` : ''}
-      `;
-  ${s.imagen ? `<img src="${s.imagen}" alt="${s.nombre || 'Imagen del día'}" class="stationImage">` : ''}
-  <p><strong>Contexto:</strong> ${s.contexto || ''}</p>
-  <p><strong>Enfoque:</strong> ${s.enfoque || ''}</p>
-  <p><strong>Metodología:</strong> ${s.metodologia || ''}</p>
-  <p><strong>TIC:</strong> ${s.tics || ''}</p>
-  <p><strong>Aportes:</strong> ${s.aportes || ''}</p>
-  ${s.fuente ? `<p><a href="${s.fuente}" target="_blank" rel="noopener noreferrer">Ver fuente</a></p>` : ''}
-`;
-}
+    if (nearby) {
+      openStation(nearby.key);
+      return;
+    }
 
-if (modalOverlay) modalOverlay.style.display = 'flex';
-}
+    if (nearExit) {
+      resetPlayer();
+      closeModal();
+    }
+  }
 
-function resetGame() {
-visited.clear();
-updateHud();
-closeModal();
+  function getInputVector() {
+    let dx = 0;
+    let dy = 0;
 
-player.x = MAIN_PATH.minX;
-player.y = MAIN_PATH.y;
+    if (keys['arrowleft'] || keys['a']) dx -= 1;
+    if (keys['arrowright'] || keys['d']) dx += 1;
+    if (keys['arrowup'] || keys['w']) dy -= 1;
+    if (keys['arrowdown'] || keys['s']) dy += 1;
 
-started = false;
-if (welcomeOverlay) welcomeOverlay.style.display = 'flex';
-}
+    dx += touchInput.dx;
+    dy += touchInput.dy;
 
-function updateMovement() {
-if (!started) return;
+    dx = Math.max(-1, Math.min(1, dx));
+    dy = Math.max(-1, Math.min(1, dy));
 
-const branch = getNearestBranch(player, 48);
-const onBranch = branch && Math.abs(player.x - branch.x) <= 2 && player.y < branch.baseY;
+    return { dx, dy };
+  }
 
-if (onBranch) {
-if (keys['arrowup'] || keys['w']) {
-player.y -= player.speed;
-if (player.y < branch.topY) player.y = branch.topY;
-}
+  function updateMovement() {
+    if (!started) return;
 
-if (keys['arrowdown'] || keys['s']) {
-player.y += player.speed;
-if (player.y > branch.baseY) player.y = branch.baseY;
-}
+    const { dx, dy } = getInputVector();
+    const branch = getNearestBranch(player, 52);
+    const onBranch = branch && Math.abs(player.x - branch.x) <= 4 && player.y < branch.baseY;
 
-if (keys['arrowleft'] || keys['a']) {
-player.y = branch.baseY;
-player.x -= player.speed;
-}
+    if (onBranch) {
+      if (dy < -0.15) {
+        player.y -= player.speed * Math.abs(dy);
+        if (player.y < branch.topY) player.y = branch.topY;
+      }
 
-if (keys['arrowright'] || keys['d']) {
-player.y = branch.baseY;
-player.x += player.speed;
-}
-} else {
-if (keys['arrowleft'] || keys['a']) player.x -= player.speed;
-if (keys['arrowright'] || keys['d']) player.x += player.speed;
+      if (dy > 0.15) {
+        player.y += player.speed * Math.abs(dy);
+        if (player.y > branch.baseY) player.y = branch.baseY;
+      }
 
-if ((keys['arrowup'] || keys['w']) && branch) {
-player.x = branch.x;
-player.y -= player.speed;
-if (player.y < branch.topY) player.y = branch.topY;
-}
+      if (dx < -0.15) {
+        player.y = branch.baseY;
+        player.x -= player.speed * Math.abs(dx);
+      }
 
-if (keys['arrowdown'] || keys['s']) {
-player.y = MAIN_PATH.y;
-}
-}
+      if (dx > 0.15) {
+        player.y = branch.baseY;
+        player.x += player.speed * Math.abs(dx);
+      }
+    } else {
+      if (dx < -0.15) player.x -= player.speed * Math.abs(dx);
+      if (dx > 0.15) player.x += player.speed * Math.abs(dx);
 
-clampPlayerToWalkable(player);
-}
+      if (dy < -0.15 && branch) {
+        player.x += (branch.x - player.x) * 0.28;
+        player.y -= player.speed * Math.abs(dy);
 
-function loop() {
-updateMovement();
-drawScene(ctx, player);
-requestAnimationFrame(loop);
-}
+        if (Math.abs(player.x - branch.x) < 1.4) {
+          player.x = branch.x;
+        }
 
-window.addEventListener('keydown', (e) => {
-const key = e.key.toLowerCase();
-keys[key] = true;
+        if (player.y < branch.topY) player.y = branch.topY;
+      }
 
-if (key === 'escape') closeModal();
+      if (dy > 0.15) {
+        player.y = MAIN_PATH.y;
+      }
+    }
 
-if (key === 'e' && !e.repeat) {
-const nearby = getNearbyStation(player);
-const nearExit = getNearbyExit(player);
+    clampPlayerToWalkable(player);
+  }
 
-if (nearby) {
-openStation(nearby.key);
-} else if (nearExit) {
-resetGame();
-}
-}
-});
+  function loop() {
+    updateMovement();
+    drawScene(ctx, player);
+    requestAnimationFrame(loop);
+  }
 
-window.addEventListener('keyup', (e) => {
-keys[e.key.toLowerCase()] = false;
-});
+  function centerJoystick() {
+    if (!joystickStick) return;
+    joystickStick.style.transform = 'translate(0px, 0px)';
+  }
 
-window.addEventListener('blur', () => {
-for (const k in keys) keys[k] = false;
-});
+  function updateJoystick(clientX, clientY) {
+    if (!joystickBase || !joystickStick) return;
 
-if (closeBtn) {
-closeBtn.addEventListener('click', closeModal);
-}
+    const rect = joystickBase.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
 
-if (modalOverlay) {
-modalOverlay.addEventListener('click', (e) => {
-if (e.target === modalOverlay) closeModal();
-});
-}
+    let dx = clientX - cx;
+    let dy = clientY - cy;
 
-if (startBtn) {
-startBtn.addEventListener('click', () => {
-started = true;
-if (welcomeOverlay) welcomeOverlay.style.display = 'none';
-});
-}
+    const max = rect.width * 0.28;
+    const dist = Math.hypot(dx, dy);
 
-updateHud();
+    if (dist > max) {
+      dx = (dx / dist) * max;
+      dy = (dy / dist) * max;
+    }
 
-if (loadingEl) {
-loadingEl.style.display = 'none';
-}
+    joystickStick.style.transform = `translate(${dx}px, ${dy}px)`;
+    touchInput.dx = dx / max;
+    touchInput.dy = dy / max;
+    touchInput.active = true;
+  }
 
-loop();
+  function endJoystick() {
+    joystickPointerId = null;
+    touchInput.dx = 0;
+    touchInput.dy = 0;
+    touchInput.active = false;
+    centerJoystick();
+  }
+
+  function canvasToGame(clientX, clientY) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    return {
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY
+    };
+  }
+
+  function getTappedStation(point) {
+    let best = null;
+
+    for (const key in MAP_STATIONS) {
+      const s = MAP_STATIONS[key];
+      const dist = Math.hypot(point.x - s.x, point.y - s.y);
+
+      if (dist <= s.r + 26 && (!best || dist < best.dist)) {
+        best = { key, ...s, dist };
+      }
+    }
+
+    return best;
+  }
+
+  function movePlayerToStation(key) {
+    const branch = BRANCHES[key];
+    if (!branch) return;
+
+    player.x = branch.x;
+    player.y = branch.topY;
+    clampPlayerToWalkable(player);
+  }
+
+  async function requestLandscape() {
+    try {
+      const root = document.documentElement;
+
+      if (root.requestFullscreen) {
+        await root.requestFullscreen();
+      }
+
+      if (screen.orientation && screen.orientation.lock) {
+        await screen.orientation.lock('landscape');
+      }
+    } catch (e) {
+    }
+  }
+
+  function isMobile() {
+    return window.matchMedia('(max-width: 900px)').matches;
+  }
+
+  function updateRotateHint() {
+    if (!rotateHint || rotateDismissed || !isMobile()) return;
+
+    const portrait = window.matchMedia('(orientation: portrait)').matches;
+    const modalOpen = modalOverlay && modalOverlay.style.display === 'flex';
+
+    rotateHint.classList.toggle('show', portrait && !modalOpen);
+  }
+
+  window.addEventListener('keydown', (e) => {
+    const key = e.key.toLowerCase();
+    keys[key] = true;
+
+    if (key === 'e' && !e.repeat) interact();
+    if (key === 'escape') closeModal();
+  });
+
+  window.addEventListener('keyup', (e) => {
+    keys[e.key.toLowerCase()] = false;
+  });
+
+  window.addEventListener('blur', () => {
+    Object.keys(keys).forEach(k => keys[k] = false);
+    endJoystick();
+  });
+
+  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+  if (modalOverlay) {
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) closeModal();
+    });
+  }
+
+  if (interactBtn) {
+    interactBtn.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      interact();
+    });
+  }
+
+  if (rotateBtn) {
+    rotateBtn.addEventListener('click', () => {
+      rotateDismissed = true;
+      if (rotateHint) rotateHint.classList.remove('show');
+      requestLandscape();
+    });
+  }
+
+  if (rotateNowBtn) {
+    rotateNowBtn.addEventListener('click', () => {
+      rotateDismissed = true;
+      if (rotateHint) rotateHint.classList.remove('show');
+      requestLandscape();
+    });
+  }
+
+  if (rotateCloseBtn) {
+    rotateCloseBtn.addEventListener('click', () => {
+      rotateDismissed = true;
+      if (rotateHint) rotateHint.classList.remove('show');
+    });
+  }
+
+  if (joystickBase) {
+    joystickBase.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      joystickPointerId = e.pointerId;
+      joystickBase.setPointerCapture(e.pointerId);
+      updateJoystick(e.clientX, e.clientY);
+    });
+
+    joystickBase.addEventListener('pointermove', (e) => {
+      if (e.pointerId !== joystickPointerId) return;
+      updateJoystick(e.clientX, e.clientY);
+    });
+
+    joystickBase.addEventListener('pointerup', (e) => {
+      if (e.pointerId !== joystickPointerId) return;
+      endJoystick();
+    });
+
+    joystickBase.addEventListener('pointercancel', endJoystick);
+    joystickBase.addEventListener('lostpointercapture', endJoystick);
+  }
+
+  canvas.addEventListener('pointerdown', (e) => {
+    const point = canvasToGame(e.clientX, e.clientY);
+    const tapped = getTappedStation(point);
+
+    if (tapped) {
+      movePlayerToStation(tapped.key);
+      interact();
+      return;
+    }
+
+    const exitDist = Math.hypot(point.x - EXIT_POINT.x, point.y - EXIT_POINT.y);
+    if (exitDist <= EXIT_POINT.r + 24) {
+      player.x = EXIT_POINT.x;
+      player.y = EXIT_POINT.y;
+      interact();
+    }
+  });
+
+  window.addEventListener('resize', updateRotateHint);
+  window.addEventListener('orientationchange', updateRotateHint);
+
+  centerJoystick();
+  updateRotateHint();
+  loop();
 });
