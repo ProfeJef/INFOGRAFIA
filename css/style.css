@@ -209,7 +209,7 @@ canvas#game{
   z-index:90;
 }
 
-/* Joystick circular original */
+/* Joystick */
 #joystickZone{
   position:fixed;
   left:18px;
@@ -235,7 +235,7 @@ canvas#game{
   box-shadow:0 3px 8px rgba(0,0,0,.3);
 }
 
-/* Botón táctil de acción */
+/* Botón acción */
 #btnAction{
   position:fixed;
   right:18px;
@@ -252,6 +252,110 @@ canvas#game{
   z-index:160;
   display:none;
   cursor:pointer;
+  touch-action:none;
+}
+
+/* Botón girar */
+#btnRotate{
+  position:fixed;
+  right:18px;
+  top:84px;
+  min-width:62px;
+  height:48px;
+  padding:0 14px;
+  border:none;
+  border-radius:14px;
+  background:rgba(20,26,40,.82);
+  color:#fff;
+  font-family:'VT323', monospace;
+  font-size:28px;
+  box-shadow:0 4px 0 rgba(0,0,0,.28);
+  z-index:165;
+  display:none;
+  cursor:pointer;
+  touch-action:none;
+}
+
+/* Botón volver */
+#btnBack{
+  position:fixed;
+  right:18px;
+  top:140px;
+  min-width:62px;
+  height:48px;
+  padding:0 14px;
+  border:none;
+  border-radius:14px;
+  background:rgba(20,26,40,.72);
+  color:#fff;
+  font-family:'VT323', monospace;
+  font-size:26px;
+  box-shadow:0 4px 0 rgba(0,0,0,.28);
+  z-index:166;
+  display:none;
+  cursor:pointer;
+  touch-action:none;
+}
+
+/* Aviso de rotación */
+#rotateHint{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.64);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  z-index:320;
+}
+
+#rotateHint.show{
+  display:flex;
+}
+
+.rotateBox{
+  width:min(92vw, 420px);
+  background:var(--panel);
+  border:5px solid var(--wood-dark);
+  border-radius:18px;
+  padding:24px 20px;
+  text-align:center;
+  box-shadow:0 16px 48px rgba(0,0,0,.35);
+}
+
+.rotateBox h3{
+  margin:0 0 10px;
+  font-size:32px;
+}
+
+.rotateBox p{
+  margin:0 0 14px;
+  font-size:24px;
+  line-height:1.1;
+}
+
+#rotateNowBtn,
+#rotateCloseBtn{
+  width:100%;
+  margin-top:10px;
+  border:none;
+  border-radius:12px;
+  padding:10px 18px;
+  font-family:'VT323', monospace;
+  font-size:26px;
+  cursor:pointer;
+}
+
+#rotateNowBtn{
+  background:var(--red);
+  color:#fff;
+  box-shadow:0 4px 0 #8e1f1a;
+}
+
+#rotateCloseBtn{
+  background:#ddd1b0;
+  color:#2a2118;
+  box-shadow:0 4px 0 #9f916d;
 }
 
 /* Modal */
@@ -336,87 +440,7 @@ canvas#game{
   background:#fff;
 }
 
-/* Botón de modo horizontal y aviso móvil */
-#btnRotate{
-  position:fixed;
-  right:18px;
-  top:84px;
-  min-width:62px;
-  height:48px;
-  padding:0 14px;
-  border:none;
-  border-radius:14px;
-  background:rgba(20,26,40,.82);
-  color:#fff;
-  font-family:'VT323', monospace;
-  font-size:28px;
-  box-shadow:0 4px 0 rgba(0,0,0,.28);
-  z-index:165;
-  display:none;
-  cursor:pointer;
-}
-
-#rotateHint{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.64);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-  z-index:320;
-}
-
-#rotateHint.show{
-  display:flex;
-}
-
-.rotateBox{
-  width:min(92vw, 420px);
-  background:var(--panel);
-  border:5px solid var(--wood-dark);
-  border-radius:18px;
-  padding:24px 20px;
-  text-align:center;
-  box-shadow:0 16px 48px rgba(0,0,0,.35);
-}
-
-.rotateBox h3{
-  margin:0 0 10px;
-  font-size:32px;
-}
-
-.rotateBox p{
-  margin:0 0 14px;
-  font-size:24px;
-  line-height:1.1;
-}
-
-#rotateNowBtn,
-#rotateCloseBtn{
-  width:100%;
-  margin-top:10px;
-  border:none;
-  border-radius:12px;
-  padding:10px 18px;
-  font-family:'VT323', monospace;
-  font-size:26px;
-  cursor:pointer;
-}
-
-#rotateNowBtn{
-  background:var(--red);
-  color:#fff;
-  box-shadow:0 4px 0 #8e1f1a;
-}
-
-#rotateCloseBtn{
-  background:#ddd1b0;
-  color:#2a2118;
-  box-shadow:0 4px 0 #9f916d;
-}
-
-/* Responsivo */
+/* Tablet y móvil */
 @media (max-width: 900px){
   #hud{
     gap:10px;
@@ -439,12 +463,13 @@ canvas#game{
   }
 }
 
+/* Mostrar controles en móvil */
 @media (max-width: 768px){
   #joystickZone,
   #btnAction,
-  #btnRotate{
+  #btnRotate,
+  #btnBack{
     display:block;
-    touch-action:none;
   }
 
   .welcomeBox h1{
@@ -506,9 +531,23 @@ canvas#game{
   }
 }
 
+/* Horizontal en móvil: mantener visibles los controles */
 @media (orientation: landscape) and (max-width: 900px){
+  #joystickZone,
+  #btnAction,
+  #btnRotate,
+  #btnBack{
+    display:block;
+    touch-action:none;
+  }
+
   #btnRotate{
     top:16px;
+    right:16px;
+  }
+
+  #btnBack{
+    top:70px;
     right:16px;
   }
 
