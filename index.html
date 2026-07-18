@@ -56,7 +56,7 @@
 
     <div id="progressBox">
       <div id="progressFill"></div>
-      <span id="progressText">0/5 dias</span>
+      <span id="progressText">0/5 días</span>
     </div>
   </header>
 
@@ -66,11 +66,24 @@
 
   <div id="fade"></div>
 
+  <!-- Controles táctiles originales -->
   <div id="joystickZone">
     <div id="joystickStick"></div>
   </div>
 
   <button id="btnAction" aria-label="Interactuar">E</button>
+
+  <!-- Botón y aviso para modo horizontal -->
+  <button id="btnRotate" aria-label="Modo horizontal">↔</button>
+
+  <div id="rotateHint">
+    <div class="rotateBox">
+      <h3>Modo detalle</h3>
+      <p>Gira el teléfono o toca el botón para ver mejor la ruta semanal ASE.</p>
+      <button id="rotateNowBtn">Poner horizontal</button>
+      <button id="rotateCloseBtn">Seguir en vertical</button>
+    </div>
+  </div>
 
   <div id="modalOverlay">
     <div class="modalBox">
