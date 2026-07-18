@@ -39,7 +39,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const keys = {};
-  window.addEventListener('keydown', e => { keys[e.key.toLowerCase()]=true; if(e.key.toLowerCase()==='e') interact(); });
+  const NAV_KEYS = ['arrowup','arrowdown','arrowleft','arrowright',' ','w','a','s','d','e'];
+  window.addEventListener('keydown', e => {
+    const k = e.key.toLowerCase();
+    if (NAV_KEYS.includes(k)) e.preventDefault();
+    keys[k]=true;
+    if (k==='e') interact();
+  }, { passive: false });
   window.addEventListener('keyup', e => { keys[e.key.toLowerCase()]=false; });
   window.addEventListener('blur', () => { for(const k in keys) keys[k]=false; });
 
