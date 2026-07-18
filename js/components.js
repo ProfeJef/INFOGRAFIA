@@ -26,18 +26,18 @@ const BRANCHES = {
 };
 
 const MAP_STATIONS = {
-  d1: { x: 177, y: 400, r: 38, label: 'LUNES' },
-  d2: { x: 345, y: 400, r: 38, label: 'MARTES' },
-  d3: { x: 518, y: 400, r: 38, label: 'MIERCOLES' },
-  d4: { x: 695, y: 400, r: 38, label: 'JUEVES' },
-  d5: { x: 872, y: 400, r: 38, label: 'VIERNES' }
+  d1: { x: 177, y: 400, r: 42, label: 'LUNES' },
+  d2: { x: 345, y: 400, r: 42, label: 'MARTES' },
+  d3: { x: 518, y: 400, r: 42, label: 'MIERCOLES' },
+  d4: { x: 695, y: 400, r: 42, label: 'JUEVES' },
+  d5: { x: 872, y: 400, r: 42, label: 'VIERNES' }
 };
 
 const EXIT_POINT = {
   key: 'exit',
   x: 1015,
   y: 445,
-  r: 28,
+  r: 32,
   label: 'SALIR'
 };
 
@@ -67,24 +67,35 @@ function drawAvatar(ctx, player) {
 
 function drawPointGlow(ctx, x, y, r, active = false, color = '255,255,180') {
   ctx.save();
-  const radius = active ? r + 10 : r - 8;
+
+  const radius = active ? r + 10 : Math.max(10, r - 8);
   const alpha = active ? 0.35 : 0.12;
+
   const gradient = ctx.createRadialGradient(x, y, 6, x, y, radius);
   gradient.addColorStop(0, `rgba(${color},${alpha})`);
   gradient.addColorStop(1, `rgba(${color},0)`);
+
   ctx.fillStyle = gradient;
   ctx.beginPath();
   ctx.arc(x, y, radius, 0, Math.PI * 2);
   ctx.fill();
+
   ctx.restore();
 }
 
-function getNearestBranch(player, tolerance = 22) {
+function getNearestBranch(player, tolerance = 48) {
+  let best = null;
+
   for (const key in BRANCHES) {
     const b = BRANCHES[key];
-    if (Math.abs(player.x - b.x) <= tolerance) return { key, ...b };
+    const dx = Math.abs(player.x - b.x);
+
+    if (dx <= tolerance && (!best || dx < best.dx)) {
+      best = { key, ...b, dx };
+    }
   }
-  return null;
+
+  return best;
 }
 
 function getNearbyStation(player) {
@@ -103,29 +114,25 @@ function getNearbyExit(player) {
 
 function drawHint(ctx, x, y, text) {
   ctx.save();
+
   ctx.fillStyle = 'rgba(0,0,0,0.84)';
   ctx.fillRect(x - 60, y - 96, 120, 30);
+
   ctx.strokeStyle = '#ffffff';
   ctx.lineWidth = 2;
   ctx.strokeRect(x - 60, y - 96, 120, 30);
+
   ctx.fillStyle = '#ffffff';
   ctx.font = 'bold 18px VT323, monospace';
   ctx.textAlign = 'center';
   ctx.fillText(text, x, y - 76);
+
   ctx.restore();
 }
 
 function clampPlayerToWalkable(player) {
-  const branch = getNearestBranch(player, 14);
-
-  if (branch && Math.abs(player.y - branch.topY) < Math.abs(player.y - branch.baseY)) {
-    player.x = branch.x;
-    player.y = Math.max(branch.topY, Math.min(branch.baseY, player.y));
-    return;
-  }
-
   player.x = Math.max(MAIN_PATH.minX, Math.min(MAIN_PATH.maxX, player.x));
-  player.y = MAIN_PATH.y;
+  player.y = Math.max(400, Math.min(445, player.y));
 }
 
 function drawScene(ctx, player) {
@@ -139,10 +146,20 @@ function drawScene(ctx, player) {
     drawPointGlow(ctx, s.x, s.y, s.r, nearby && nearby.key === key);
   }
 
-  drawPointGlow(ctx, EXIT_POINT.x, EXIT_POINT.y, EXIT_POINT.r, !!nearExit, '255,120,120');
+  drawPointGlow(
+    ctx,
+    EXIT_POINT.x,
+    EXIT_POINT.y,
+    EXIT_POINT.r,
+    !!nearExit,
+    '255,120,120'
+  );
 
   drawAvatar(ctx, player);
 
-  if (nearby) drawHint(ctx, player.x, player.y, 'Presiona E');
-  else if (nearExit) drawHint(ctx, player.x, player.y, 'Salir: E');
+  if (nearby) {
+    drawHint(ctx, player.x, player.y, 'Presiona E');
+  } else if (nearExit) {
+    drawHint(ctx, player.x, player.y, 'Salir: E');
+  }
 }
