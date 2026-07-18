@@ -15,19 +15,25 @@ document.addEventListener('DOMContentLoaded', () => {
   const weekPct = document.getElementById('weekPct');
   const flowPct = document.getElementById('flowPct');
 
+  const modalOverlay = document.getElementById('modalOverlay');
+  const modalTag = document.getElementById('modalTag');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalBody = document.getElementById('modalBody');
+  const closeBtn = document.getElementById('closeBtn');
+
   canvas.width = GAME.width;
   canvas.height = GAME.height;
 
   const visited = new Set();
+  const keys = {};
+
+  let started = false;
 
   const player = {
     x: MAIN_PATH.minX,
     y: MAIN_PATH.y,
     speed: 3
   };
-
-  const keys = {};
-  let started = false;
 
   function updateHud() {
     const total = Object.keys(MAP_STATIONS).length;
@@ -36,27 +42,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (progressFill) progressFill.style.width = pct + '%';
     if (progressText) progressText.textContent = `${done}/${total} días`;
+
     if (aseBar) aseBar.style.width = pct + '%';
     if (weekBar) weekBar.style.width = pct + '%';
     if (flowBar) flowBar.style.width = pct + '%';
+
     if (asePct) asePct.textContent = pct + '%';
     if (weekPct) weekPct.textContent = pct + '%';
     if (flowPct) flowPct.textContent = pct + '%';
   }
 
   function closeModal() {
-    const modal = document.getElementById('modalOverlay');
-    if (modal) modal.style.display = 'none';
-  }
-
-  function resetGame() {
-    visited.clear();
-    updateHud();
-    closeModal();
-    player.x = MAIN_PATH.minX;
-    player.y = MAIN_PATH.y;
-    started = false;
-    if (welcomeOverlay) welcomeOverlay.style.display = 'flex';
+    if (modalOverlay) modalOverlay.style.display = 'none';
   }
 
   function openStation(key) {
@@ -66,40 +63,58 @@ document.addEventListener('DOMContentLoaded', () => {
     visited.add(key);
     updateHud();
 
-    const tag = document.getElementById('modalTag');
-    const title = document.getElementById('modalTitle');
-    const body = document.getElementById('modalBody');
-    const modal = document.getElementById('modalOverlay');
+    if (modalTag) modalTag.textContent = s.zona || 'DÍA';
+    if (modalTitle) modalTitle.textContent = s.nombre || '';
 
-    if (tag) tag.textContent = s.zona || 'DÍA';
-    if (title) title.textContent = s.nombre || '';
-    if (!body) return;
+    if (modalBody) {
+      modalBody.className = s.zona ? String(s.zona).toLowerCase() : '';
+      modalBody.innerHTML = `
+        <p><strong>Contexto:</strong> ${s.contexto || ''}</p>
+        <p><strong>Enfoque:</strong> ${s.enfoque || ''}</p>
+        <p><strong>Metodología:</strong> ${s.metodologia || ''}</p>
+        <p><strong>TIC:</strong> ${s.tics || ''}</p>
+        <p><strong>Aportes:</strong> ${s.aportes || ''}</p>
+        ${s.fuente ? `<p><a href="${s.fuente}" target="_blank" rel="noopener noreferrer">Ver fuente</a></p>` : ''}
+      `;
+    }
 
-    body.innerHTML = `
-      <p><strong>Contexto:</strong> ${s.contexto || ''}</p>
-      <p><strong>Enfoque:</strong> ${s.enfoque || ''}</p>
-      <p><strong>Metodología:</strong> ${s.metodologia || ''}</p>
-      <p><strong>TIC:</strong> ${s.tics || ''}</p>
-      <p><strong>Aportes:</strong> ${s.aportes || ''}</p>
-      ${s.fuente ? `<p><a href="${s.fuente}" target="_blank" rel="noopener noreferrer">Ver fuente</a></p>` : ''}
-    `;
+    if (modalOverlay) modalOverlay.style.display = 'flex';
+  }
 
-    if (modal) modal.style.display = 'flex';
+  function resetGame() {
+    visited.clear();
+    updateHud();
+    closeModal();
+
+    player.x = MAIN_PATH.minX;
+    player.y = MAIN_PATH.y;
+
+    started = false;
+    if (welcomeOverlay) welcomeOverlay.style.display = 'flex';
   }
 
   function updateMovement() {
     if (!started) return;
 
-    const branch = getNearestBranch(player, 16);
-    const onBranch = branch && Math.abs(player.x - branch.x) < 1 && player.y < branch.baseY + 0.5;
+    const branch = getNearestBranch(player, 48);
+    const onBranch = branch && Math.abs(player.x - branch.x) <= 2 && player.y < branch.baseY;
 
     if (onBranch) {
-      if (keys['arrowup'] || keys['w']) player.y -= player.speed;
-      if (keys['arrowdown'] || keys['s']) player.y += player.speed;
+      if (keys['arrowup'] || keys['w']) {
+        player.y -= player.speed;
+        if (player.y < branch.topY) player.y = branch.topY;
+      }
+
+      if (keys['arrowdown'] || keys['s']) {
+        player.y += player.speed;
+        if (player.y > branch.baseY) player.y = branch.baseY;
+      }
+
       if (keys['arrowleft'] || keys['a']) {
         player.y = branch.baseY;
         player.x -= player.speed;
       }
+
       if (keys['arrowright'] || keys['d']) {
         player.y = branch.baseY;
         player.x += player.speed;
@@ -111,6 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if ((keys['arrowup'] || keys['w']) && branch) {
         player.x = branch.x;
         player.y -= player.speed;
+        if (player.y < branch.topY) player.y = branch.topY;
       }
 
       if (keys['arrowdown'] || keys['s']) {
@@ -122,8 +138,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function loop() {
-    drawScene(ctx, player);
     updateMovement();
+    drawScene(ctx, player);
     requestAnimationFrame(loop);
   }
 
@@ -137,8 +153,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const nearby = getNearbyStation(player);
       const nearExit = getNearbyExit(player);
 
-      if (nearby) openStation(nearby.key);
-      else if (nearExit) resetGame();
+      if (nearby) {
+        openStation(nearby.key);
+      } else if (nearExit) {
+        resetGame();
+      }
     }
   });
 
@@ -150,10 +169,10 @@ document.addEventListener('DOMContentLoaded', () => {
     for (const k in keys) keys[k] = false;
   });
 
-  const closeBtn = document.getElementById('closeBtn');
-  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeModal);
+  }
 
-  const modalOverlay = document.getElementById('modalOverlay');
   if (modalOverlay) {
     modalOverlay.addEventListener('click', (e) => {
       if (e.target === modalOverlay) closeModal();
@@ -169,7 +188,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   updateHud();
 
-  if (loadingEl) loadingEl.style.display = 'none';
+  if (loadingEl) {
+    loadingEl.style.display = 'none';
+  }
 
   loop();
 });
