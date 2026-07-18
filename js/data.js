@@ -1,54 +1,57 @@
-// data.js — Contenido de cada dia de la semana pedagogica
+// data.js — contenido de cada estación/modal
 const STATIONS = {
-  d0: { zona:'inicio', nombre:'Introduccion y Justificacion',
-    contexto:'Los descansos de primaria como espacios formativos de encuentro, juego y convivencia.',
-    enfoque:'Integrar el Aprendizaje Social y Emocional (ASE) al curriculo vivo, no como relleno sino como eje transversal.',
-    metodologia:'El descanso se resignifica como un laboratorio pedagogico, con actividades guiadas cada dia de la semana.',
-    tics:'—',
-    aportes:'Sienta las bases conceptuales de toda la ruta semanal.',
-    fuente:null },
-  d1: { zona:'lunes', nombre:'Lunes de Ritmo y Escucha',
-    contexto:'Responsable: Docente de Musica. Exploracion instrumental, canto y percusion corporal en el patio.',
-    enfoque:'Sensibilidad artistica y expresion sonora colectiva.',
-    metodologia:'Circulos de ritmo, canciones rondas y percusion con materiales reciclados.',
-    tics:'Grabadora de voz para registrar composiciones grupales.',
-    aportes:'Fortalece autocontrol, respeto por los turnos y cuidado de instrumentos compartidos.',
-    fuente:null },
-  d2: { zona:'martes', nombre:'Martes de Memoria Ludica',
-    contexto:'Responsable: Docente de Educacion Fisica. Trompo, metras, salto de lazo, golosa.',
-    enfoque:'Recuperar la cultura infantil tradicional y la coordinacion motriz.',
-    metodologia:'Estaciones rotativas de juegos tradicionales con reglas acordadas por los estudiantes.',
-    tics:'—',
-    aportes:'Cooperacion, resolucion pacifica de conflictos y motricidad gruesa.',
-    fuente:null },
-  d3: { zona:'miercoles', nombre:'Miercoles de Estrategia Logica',
-    contexto:'Responsable: Docente de Matematicas. Ajedrez, parques, domino, tangram y retos logicos.',
-    enfoque:'Pensamiento estrategico y toma de decisiones.',
-    metodologia:'Torneos breves por parejas con acompanamiento docente y fichas de registro de jugadas.',
-    tics:'Apps de ajedrez para practicar en casa (opcional).',
-    aportes:'Paciencia ante la frustracion, atencion sostenida y planificacion.',
-    fuente:null },
-  d4: { zona:'jueves', nombre:'Jueves de Expresion y Pantallas',
-    contexto:'Cine pedagogico en cafeteria y karaoke en el aula virtual.',
-    enfoque:'Lectura audiovisual critica y expresion oral.',
-    metodologia:'Proyeccion de cortos educativos seguida de dialogo guiado; sesiones de karaoke por grupos.',
-    tics:'Proyector, plataforma de streaming educativo, microfono.',
-    aportes:'Ciudadania digital, disfrute comunicativo y trabajo en equipo.',
-    fuente:null },
-  d5: { zona:'viernes', nombre:'Viernes de Movimiento Colectivo',
-    contexto:'Responsables: Danzas y Ciencias Sociales. Rumba terapia y expresion corporal dirigida.',
-    enfoque:'Bienestar fisico e identidad cultural.',
-    metodologia:'Coreografias grupales sencillas con musica regional, cierre semanal simbolico.',
-    tics:'Parlante bluetooth, listas de reproduccion colaborativas.',
-    aportes:'Integracion grupal y estado de flow (disfrute profundo) para cerrar la semana.',
-    fuente:null },
-  d6: { zona:'final', nombre:'Mision Cumplida: Laboratorio de Ciudadania',
-    contexto:'Conclusiones y evaluacion formativa de la semana.',
-    enfoque:'El descanso como tiempo educativo protegido.',
-    metodologia:'Evaluacion cualitativa en 5 dimensiones: Participacion, Convivencia, Autonomia, Creatividad y Cuidado Institucional.',
-    tics:'—',
-    aportes:'Un curriculo mas humano, sensible e inclusivo, con multiples vias de participacion.',
-    fuente:null }
-};
+  d1: {
+    zona: 'Lunes',
+    nombre: 'Lunes — Encuentro, juego y convivencia',
+    contexto: 'El lunes representa el inicio del recorrido semanal y funciona como un momento de bienvenida, encuentro y disposición afectiva para aprender.',
+    enfoque: 'Se fortalece la convivencia escolar mediante actividades de integración, juego, música y reconocimiento del otro.',
+    metodologia: 'Se promueven dinámicas de apertura, interacción grupal y participación activa para crear un ambiente seguro y cercano.',
+    tics: 'Las TIC pueden apoyar con recursos audiovisuales, canciones, animaciones o actividades interactivas que faciliten la motivación y el vínculo.',
+    aportes: 'Favorece el sentido de pertenencia, la confianza, la expresión emocional inicial y la disposición positiva para el resto de la semana.',
+    fuente: ''
+  },
 
-const DAY_ORDER = ['d0','d1','d2','d3','d4','d5','d6'];
+  d2: {
+    zona: 'Martes',
+    nombre: 'Martes — Comunicación, empatía y trabajo en equipo',
+    contexto: 'El martes se orienta al fortalecimiento de habilidades sociales mediante actividades de interacción entre pares.',
+    enfoque: 'Se busca desarrollar la comunicación, la empatía, la escucha y la colaboración en situaciones compartidas.',
+    metodologia: 'Se utilizan juegos cooperativos, resolución conjunta de tareas, diálogo guiado y participación en pequeños grupos.',
+    tics: 'Las TIC pueden integrarse mediante videos, retos interactivos, secuencias visuales, presentaciones o herramientas colaborativas.',
+    aportes: 'Contribuye al trabajo en equipo, al reconocimiento de emociones en otros y a la construcción de relaciones respetuosas.',
+    fuente: ''
+  },
+
+  d3: {
+    zona: 'Miércoles',
+    nombre: 'Miércoles — Exploración, pensamiento crítico y creatividad',
+    contexto: 'El miércoles se concibe como un espacio de exploración, descubrimiento y construcción activa del aprendizaje.',
+    enfoque: 'Se favorece el pensamiento crítico, la curiosidad, la creatividad y la capacidad de formular preguntas y soluciones.',
+    metodologia: 'Se proponen actividades de observación, investigación, lectura, análisis, juego de ideas y producción creativa.',
+    tics: 'Las TIC pueden apoyar con búsquedas guiadas, recursos multimedia, mapas conceptuales, plataformas interactivas y producción digital.',
+    aportes: 'Impulsa la autonomía intelectual, la curiosidad, la imaginación y la participación reflexiva en procesos de aprendizaje.',
+    fuente: ''
+  },
+
+  d4: {
+    zona: 'Jueves',
+    nombre: 'Jueves — Expresión, escucha activa y respeto',
+    contexto: 'El jueves se enfoca en la expresión de ideas, emociones y opiniones dentro de un ambiente de respeto y escucha.',
+    enfoque: 'Se fortalece la comunicación asertiva, la escucha activa, la apreciación de distintas voces y el respeto por la diversidad.',
+    metodologia: 'Se pueden usar espacios de conversación, narración, proyección audiovisual, discusión guiada y reflexión grupal.',
+    tics: 'Las TIC aportan mediante videos, grabaciones, presentaciones, recursos sonoros o contenidos que inviten al análisis compartido.',
+    aportes: 'Promueve la expresión personal, la escucha consciente, la convivencia democrática y la valoración del otro.',
+    fuente: ''
+  },
+
+  d5: {
+    zona: 'Viernes',
+    nombre: 'Viernes — Solidaridad, alegría y comunidad',
+    contexto: 'El viernes simboliza el cierre del recorrido con experiencias de celebración, convivencia y construcción de comunidad.',
+    enfoque: 'Se resaltan la solidaridad, la alegría compartida, el reconocimiento colectivo y la participación comunitaria.',
+    metodologia: 'Se integran actividades lúdicas, artísticas, cooperativas y celebrativas que permitan cerrar la semana con sentido positivo.',
+    tics: 'Las TIC pueden enriquecer este momento con música, proyecciones, registro fotográfico, producciones creativas o dinámicas digitales.',
+    aportes: 'Fortalece los vínculos, la identidad colectiva, la motivación, la alegría de aprender y el sentido de comunidad escolar.',
+    fuente: ''
+  }
+};
