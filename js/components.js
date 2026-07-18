@@ -19,7 +19,7 @@ const ASSETS = {
 };
 
 // Rutas de imágenes
-ASSETS.background.src = 'assets/FONDO-INFOGRAFÍA.png';
+ASSETS.background.src = 'assets/FONDO-INFOGRAFIA.png';
 ASSETS.avatar.src = 'assets/avatar-1.png';
 ASSETS.lunes.src = 'assets/lunes-1.png';
 ASSETS.martes.src = 'assets/martes-1.png';
