@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mapa de Ruta Pedagogica - RPG Escolar</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="statusbar">
+  <div class="status-group">
+    <span class="status-icon">❤️</span>
+    <span class="status-label">ASE GENERAL</span>
+    <div class="bar-outer"><div class="bar-inner red" id="aseBar"></div></div>
+    <span class="bar-pct" id="asePct">0%</span>
+  </div>
+  <div class="status-group">
+    <span class="status-icon">📅</span>
+    <span class="status-label">SEMANA (DIAS)</span>
+    <div class="bar-outer"><div class="bar-inner yellow" id="weekBar"></div></div>
+    <span class="bar-pct" id="weekPct">0%</span>
+  </div>
+  <div class="status-group">
+    <span class="status-icon">⭐</span>
+    <span class="status-label">FLOW / DISFRUTE</span>
+    <div class="bar-outer"><div class="bar-inner green" id="flowBar"></div></div>
+    <span class="bar-pct" id="flowPct">0%</span>
+  </div>
+</div>
+
+<h1 class="mapTitle">MAPA DE RUTA PEDAGOGICA: SEMANA DEL DESCANSO SIGNIFICATIVO</h1>
+
+<div id="trackScroll">
+<div id="track">
+
+  <div id="avatarWrap">
+    <span class="player-arrow">⬆️</span>
+    <div id="avatar">
+<svg viewBox="0 0 40 50" class="sprite-svg avatar-svg" shape-rendering="crispEdges">
+  <rect x="10" y="4" width="20" height="16" fill="#f6c39b"/>
+  <rect x="10" y="4" width="20" height="6" fill="#f9d2ae"/>
+  <rect x="8" y="0" width="24" height="8" fill="#c0392b"/>
+  <rect x="8" y="0" width="24" height="3" fill="#e05c4b"/>
+  <rect x="6" y="6" width="4" height="6" fill="#c0392b"/>
+  <rect x="30" y="6" width="4" height="6" fill="#c0392b"/>
+  <rect x="14" y="12" width="2" height="2" fill="#2c2c2c"/>
+  <rect x="24" y="12" width="2" height="2" fill="#2c2c2c"/>
+  <rect x="10" y="20" width="20" height="16" fill="#2980b9"/>
+  <rect x="10" y="20" width="20" height="4" fill="#5da3d9"/>
+  <rect x="6" y="22" width="6" height="12" fill="#e67e22"/>
+  <rect x="6" y="22" width="6" height="3" fill="#f0995a"/>
+  <rect x="10" y="36" width="8" height="12" fill="#34495e"/>
+  <rect x="22" y="36" width="8" height="12" fill="#34495e"/>
+  <rect x="10" y="36" width="8" height="3" fill="#4a6178"/>
+  <rect x="22" y="36" width="8" height="3" fill="#4a6178"/>
+</svg>
+</div>
+    <span class="avatar-label">TU AVATAR</span>
+  </div>
+
+  <div class="station" data-id="0" data-title="Nivel 1: El Curriculo Vivo" data-tag="INTRODUCCION Y JUSTIFICACION">
+    <div class="badge"><span>❗</span></div>
+    <div class="scene">
+<svg viewBox="0 0 100 90" class="sprite-svg" shape-rendering="crispEdges">
+  <rect x="15" y="45" width="70" height="40" fill="#c98f56"/>
+  <rect x="15" y="45" width="70" height="6" fill="#e0ac72"/>
+  <rect x="15" y="75" width="70" height="10" fill="#a5672e"/>
+  <rect x="15" y="45" width="70" height="40" fill="none" stroke="#5d3a1a" stroke-width="2"/>
+  <polygon points="10,45 50,15 90,45" fill="#8b5a2b" stroke="#5d3a1a" stroke-width="2"/>
+  <polygon points="50,15 90,45 78,45 50,22" fill="#a5713c"/>
+  <polygon points="10,45 50,15 50,22 22,45" fill="#6e4420"/>
+  <rect x="10" y="43" width="80" height="4" fill="#5d3a1a"/>
+  <rect x="42" y="60" width="16" height="25" fill="#5d3a1a"/>
+  <rect x="44" y="62" width="12" height="21" fill="#3a2410"/>
+  <circle cx="52" cy="72" r="1.5" fill="#e0ac72"/>
+  <rect x="24" y="55" width="12" height="12" fill="#bfe4f5" stroke="#5d3a1a" stroke-width="2"/>
+  <rect x="24" y="55" width="6" height="6" fill="#e8f7ff"/>
+  <rect x="64" y="55" width="12" height="12" fill="#bfe4f5" stroke="#5d3a1a" stroke-width="2"/>
+  <rect x="64" y="55" width="6" height="6" fill="#e8f7ff"/>
+  <rect x="46" y="20" width="6" height="14" fill="#7f8c8d"/>
+  <rect x="46" y="20" width="3" height="14" fill="#95a5a6"/>
+  <polygon points="52,20 65,24 52,28" fill="#e74c3c"/>
+  <ellipse cx="50" cy="87" rx="42" ry="4" fill="rgba(0,0,0,0.15)"/>
+</svg>
+</div>
+    <div class="platform-base"></div>
+    <div class="day-label">INICIO</div>
+  </div>
+  <div class="ground-seg">
+    <span class="fence-post" style="left:15%;"></span>
+    <span class="fence-post" style="left:22%;"></span>
+    <span class="fence-rail" style="left:14%;"></span>
+    <span class="deco" style="left:55%;">🌳</span>
+  </div>
+
+  <div class="station" data-id="1" data-title="Lunes de Ritmo y Escucha" data-tag="Responsable: Docente de Musica">
+    <div class="badge"><span>❗</span></div>
+    <div class="scene">
+<svg viewBox="0 0 100 90" class="sprite-svg" shape-rendering="crispEdges">
+  <rect x="10" y="40" width="80" height="45" fill="#c98f56"/>
+  <rect x="10" y="40" width="80" height="6" fill="#e0ac72"/>
+  <rect x="10" y="79" width="80" height="6" fill="#a5672e"/>
+  <rect x="10" y="40" width="80" height="45" fill="none" stroke="#5d3a1a" stroke-width="2"/>
+  <polygon points="5,40 50,10 95,40" fill="#a33b2b" stroke="#5d3a1a" stroke-width="2"/>
+  <polygon points="50,10 95,40 82,40 50,17" fill="#c0392b"/>
+  <polygon points="5,40 50,10 50,17 18,40" fill="#7a2418"/>
+  <rect x="42" y="55" width="16" height="30" fill="#5d3a1a"/>
+  <rect x="44" y="57" width="12" height="26" fill="#3a2410"/>
+  <rect x="18" y="50" width="14" height="14" fill="#bfe4f5" stroke="#5d3a1a" stroke-width="2"/>
+  <rect x="18" y="50" width="7" height="7" fill="#e8f7ff"/>
+  <rect x="68" y="50" width="14" height="14" fill="#bfe4f5" stroke="#5d3a1a" stroke-width="2"/>
+  <rect x="68" y="50" width="7" height="7" fill="#e8f7ff"/>
+  <circle cx="25" cy="70" r="9" fill="#f6c39b"/>
+  <circle cx="25" cy="67" r="9" fill="#f9d2ae" opacity="0.5"/>
+  <path d="M17,64 Q25,58 33,64" fill="#3a2b1a"/>
+  <rect x="18" y="76" width="14" height="10" fill="#4a6fa5"/>
+  <rect x="18" y="76" width="14" height="4" fill="#5c85c4"/>
+  <rect x="30" y="63" width="4" height="20" fill="#3a2b1a"/>
+  <ellipse cx="34" cy="78" rx="6" ry="9" fill="#a5672e" stroke="#5d3a1a" stroke-width="1"/>
+  <circle cx="68" cy="72" r="8" fill="#f6c39b"/>
+  <path d="M61,69 Q68,63 75,69" fill="#222"/>
+  <rect x="60" y="78" width="16" height="8" fill="#c0392b"/>
+  <rect x="60" y="78" width="16" height="3" fill="#e05c4b"/>
+  <rect x="58" y="62" width="20" height="10" fill="#8b5a2b" stroke="#5d3a1a" stroke-width="1"/>
+  <rect x="58" y="62" width="20" height="4" fill="#deb887"/>
+  <ellipse cx="50" cy="87" rx="42" ry="4" fill="rgba(0,0,0,0.15)"/>
+</svg>
+</div>
+    <div class="platform-base"></div>
+    <div class="day-label">LUNES</div>
+  </div>
+  <div class="ground-seg">
+    <div class="signpost">CAMINO SEMANAL</div>
+    <span class="fence-post" style="left:70%;"></span>
+    <span class="fence-post" style="left:78%;"></span>
+    <span class="fence-rail" style="left:69%;"></span>
+    <span class="deco" style="left:20%;">🌸</span>
+  </div>
+
+  <div class="station" data-id="2" data-title="Martes de Memoria Ludica" data-tag="Responsable: Docente de Educacion Fisica">
+    <div class="bubble">💭</div>
+    <div class="badge"><span>❗</span></div>
+    <div class="scene">
+<svg viewBox="0 0 100 90" class="sprite-svg" shape-rendering="crispEdges">
+  <rect x="0" y="55" width="100" height="30" fill="#d8c9a3"/>
+  <rect x="0" y="55" width="100" height="5" fill="#e6d9b8"/>
+  <rect x="0" y="80" width="100" height="5" fill="#c2b28c"/>
+  <circle cx="30" cy="45" r="14" fill="none" stroke="#e74c3c" stroke-width="4"/>
+  <circle cx="30" cy="45" r="14" fill="none" stroke="#ff8a75" stroke-width="1.5" opacity="0.6"/>
+  <circle cx="30" cy="45" r="4" fill="#e74c3c"/>
+  <rect x="60" y="30" width="4" height="35" fill="#7f8c8d"/>
+  <rect x="61" y="30" width="1.5" height="35" fill="#bdc3c7"/>
+  <path d="M50,20 L74,20 L62,32 Z" fill="#f1c40f" stroke="#5d3a1a" stroke-width="2"/>
+  <path d="M50,20 L62,20 L58,26 Z" fill="#f9dc6b"/>
+  <ellipse cx="62" cy="30" rx="4" ry="2" fill="rgba(0,0,0,0.2)"/>
+  <circle cx="20" cy="68" r="9" fill="#f6c39b"/>
+  <path d="M13,65 Q20,58 27,65" fill="#5c3a21"/>
+  <rect x="13" y="74" width="14" height="10" fill="#e67e22"/>
+  <rect x="13" y="74" width="14" height="4" fill="#f0995a"/>
+  <circle cx="78" cy="68" r="9" fill="#e8b382"/>
+  <path d="M71,65 Q78,58 85,65" fill="#2c2c2c"/>
+  <rect x="71" y="74" width="14" height="10" fill="#2980b9"/>
+  <rect x="71" y="74" width="14" height="4" fill="#5da3d9"/>
+  <ellipse cx="50" cy="87" rx="42" ry="4" fill="rgba(0,0,0,0.12)"/>
+</svg>
+</div>
+    <div class="platform-base"></div>
+    <div class="day-label">MARTES</div>
+  </div>
+  <div class="ground-seg">
+    <span class="fence-post" style="left:30%;"></span>
+    <span class="fence-post" style="left:38%;"></span>
+    <span class="fence-rail" style="left:29%;"></span>
+    <span class="deco" style="left:65%;">🌳</span>
+  </div>
+
+  <div class="station" data-id="3" data-title="Miercoles de Estrategia Logica" data-tag="Responsable: Docente de Matematicas">
+    <div class="play-marker"><span class="tag-text">¡JUEGA AQUI!</span><span class="arrow">↖️</span></div>
+    <div class="badge"><span>❗</span></div>
+    <div class="scene">
+<svg viewBox="0 0 100 90" class="sprite-svg" shape-rendering="crispEdges">
+  <rect x="30" y="10" width="45" height="30" fill="#8b5a2b" stroke="#5d3a1a" stroke-width="2"/>
+  <rect x="30" y="10" width="45" height="4" fill="#a5713c"/>
+  <rect x="34" y="14" width="8" height="22" fill="#c0392b"/>
+  <rect x="34" y="14" width="8" height="4" fill="#e0655a"/>
+  <rect x="46" y="14" width="8" height="22" fill="#2980b9"/>
+  <rect x="46" y="14" width="8" height="4" fill="#5da3d9"/>
+  <rect x="58" y="14" width="8" height="22" fill="#27ae60"/>
+  <rect x="58" y="14" width="8" height="4" fill="#58d68d"/>
+  <rect x="20" y="55" width="55" height="30" fill="#c98f56" stroke="#5d3a1a" stroke-width="2"/>
+  <rect x="20" y="55" width="55" height="5" fill="#e0ac72"/>
+  <rect x="25" y="60" width="6" height="6" fill="#222"/>
+  <rect x="31" y="60" width="6" height="6" fill="#eee"/>
+  <rect x="37" y="60" width="6" height="6" fill="#222"/>
+  <rect x="43" y="60" width="6" height="6" fill="#eee"/>
+  <rect x="25" y="66" width="6" height="6" fill="#eee"/>
+  <rect x="31" y="66" width="6" height="6" fill="#222"/>
+  <rect x="37" y="66" width="6" height="6" fill="#eee"/>
+  <rect x="43" y="66" width="6" height="6" fill="#222"/>
+  <rect x="24" y="59" width="26" height="14" fill="none" stroke="#5d3a1a" stroke-width="1.5"/>
+  <rect x="55" y="60" width="6" height="10" fill="#34495e"/>
+  <rect x="55" y="60" width="2" height="10" fill="#5d7290"/>
+  <rect x="63" y="58" width="6" height="12" fill="#c0392b"/>
+  <rect x="63" y="58" width="2" height="12" fill="#e0655a"/>
+  <ellipse cx="50" cy="87" rx="42" ry="4" fill="rgba(0,0,0,0.12)"/>
+</svg>
+</div>
+    <div class="platform-base"></div>
+    <div class="day-label">MIERCOLES</div>
+  </div>
+  <div class="ground-seg">
+    <span class="fence-post" style="left:20%;"></span>
+    <span class="fence-post" style="left:28%;"></span>
+    <span class="fence-rail" style="left:19%;"></span>
+    <span class="deco" style="left:70%;">🌿</span>
+  </div>
+
+  <div class="station" data-id="4" data-title="Jueves de Expresion y Pantallas" data-tag="C. Naturales, Lengua Castellana e Informatica">
+    <div class="badge"><span>❗</span></div>
+    <div class="scene">
+<svg viewBox="0 0 100 90" class="sprite-svg" shape-rendering="crispEdges">
+  <rect x="15" y="10" width="70" height="45" fill="#2c1a4d" stroke="#5d3a1a" stroke-width="2"/>
+  <rect x="15" y="10" width="70" height="5" fill="#4a2f7a"/>
+  <rect x="25" y="18" width="50" height="30" fill="#6c5ce7"/>
+  <rect x="25" y="18" width="50" height="8" fill="#8e7dee"/>
+  <rect x="25" y="18" width="50" height="30" fill="none" stroke="#3a2b6d" stroke-width="1.5"/>
+  <polygon points="42,26 42,40 58,33" fill="#fff"/>
+  <polygon points="42,26 42,33 50,29" fill="#f0f0ff"/>
+  <rect x="12" y="60" width="16" height="20" fill="#c0392b" rx="2"/>
+  <rect x="12" y="60" width="16" height="5" fill="#e0655a" rx="2"/>
+  <rect x="32" y="60" width="16" height="20" fill="#c0392b" rx="2"/>
+  <rect x="32" y="60" width="16" height="5" fill="#e0655a" rx="2"/>
+  <rect x="52" y="60" width="16" height="20" fill="#a5281f" rx="2"/>
+  <rect x="52" y="60" width="16" height="5" fill="#c94f42" rx="2"/>
+  <rect x="72" y="60" width="16" height="20" fill="#a5281f" rx="2"/>
+  <rect x="72" y="60" width="16" height="5" fill="#c94f42" rx="2"/>
+  <ellipse cx="50" cy="87" rx="42" ry="4" fill="rgba(0,0,0,0.15)"/>
+</svg>
+</div>
+    <div class="platform-base"></div>
+    <div class="day-label">JUEVES</div>
+  </div>
+  <div class="ground-seg">
+    <span class="fence-post" style="left:40%;"></span>
+    <span class="fence-post" style="left:48%;"></span>
+    <span class="fence-rail" style="left:39%;"></span>
+    <span class="deco" style="left:15%;">🪨</span>
+  </div>
+
+  <div class="station" data-id="5" data-title="Viernes de Movimiento Colectivo" data-tag="Responsables: Danzas y Ciencias Sociales">
+    <div class="badge"><span>❗</span></div>
+    <div class="scene">
+<svg viewBox="0 0 100 90" class="sprite-svg" shape-rendering="crispEdges">
+  <rect x="10" y="55" width="20" height="30" fill="#d63384"/>
+  <rect x="30" y="55" width="20" height="30" fill="#e91e63"/>
+  <rect x="50" y="55" width="20" height="30" fill="#d63384"/>
+  <rect x="70" y="55" width="20" height="30" fill="#e91e63"/>
+  <rect x="10" y="55" width="80" height="4" fill="#ff6fa5" opacity="0.6"/>
+  <circle cx="30" cy="35" r="8" fill="#f6c39b"/>
+  <path d="M23,32 Q30,25 37,32" fill="#3a2410"/>
+  <rect x="24" y="43" width="12" height="18" fill="#f39c12"/>
+  <rect x="24" y="43" width="12" height="5" fill="#f7b752"/>
+  <rect x="18" y="45" width="6" height="4" fill="#f6c39b" transform="rotate(-30 21 47)"/>
+  <rect x="36" y="45" width="6" height="4" fill="#f6c39b" transform="rotate(30 39 47)"/>
+  <circle cx="65" cy="35" r="8" fill="#c68642"/>
+  <path d="M58,32 Q65,25 72,32" fill="#1a1a1a"/>
+  <rect x="59" y="43" width="12" height="18" fill="#2980b9"/>
+  <rect x="59" y="43" width="12" height="5" fill="#5da3d9"/>
+  <rect x="53" y="45" width="6" height="4" fill="#c68642" transform="rotate(-30 56 47)"/>
+  <rect x="71" y="45" width="6" height="4" fill="#c68642" transform="rotate(30 74 47)"/>
+  <circle cx="20" cy="15" r="4" fill="#f1c40f"/>
+  <circle cx="20" cy="15" r="6" fill="#f1c40f" opacity="0.25"/>
+  <circle cx="80" cy="20" r="4" fill="#e74c3c"/>
+  <circle cx="80" cy="20" r="6" fill="#e74c3c" opacity="0.25"/>
+  <circle cx="50" cy="10" r="4" fill="#3498db"/>
+  <circle cx="50" cy="10" r="6" fill="#3498db" opacity="0.25"/>
+  <ellipse cx="50" cy="87" rx="42" ry="4" fill="rgba(0,0,0,0.15)"/>
+</svg>
+</div>
+    <div class="platform-base"></div>
+    <div class="day-label">VIERNES</div>
+  </div>
+  <div class="ground-seg">
+    <span class="fence-post" style="left:25%;"></span>
+    <span class="fence-post" style="left:33%;"></span>
+    <span class="fence-rail" style="left:24%;"></span>
+    <span class="deco" style="left:60%;">🌳</span>
+  </div>
+
+  <div class="station" data-id="6" data-title="Mision Cumplida! Laboratorio de Ciudadania" data-tag="CONCLUSIONES Y EVALUACION">
+    <div class="badge"><span>❗</span></div>
+    <div class="scene">
+<svg viewBox="0 0 100 90" class="sprite-svg" shape-rendering="crispEdges">
+  <rect x="45" y="15" width="6" height="65" fill="#7f8c8d"/>
+  <rect x="45" y="15" width="2" height="65" fill="#bdc3c7"/>
+  <polygon points="51,18 85,28 51,38" fill="#2ecc71" stroke="#5d3a1a" stroke-width="1.5"/>
+  <polygon points="51,18 68,23 51,28" fill="#58d68d"/>
+  <rect x="20" y="70" width="60" height="15" fill="#6c757d" rx="2"/>
+  <rect x="20" y="70" width="60" height="4" fill="#95a5a6" rx="2"/>
+  <rect x="24" y="60" width="10" height="10" fill="#222"/>
+  <rect x="34" y="60" width="10" height="10" fill="#fff"/>
+  <rect x="44" y="60" width="10" height="10" fill="#222"/>
+  <rect x="54" y="60" width="10" height="10" fill="#fff"/>
+  <rect x="64" y="60" width="10" height="10" fill="#222"/>
+  <rect x="24" y="60" width="50" height="10" fill="none" stroke="#5d3a1a" stroke-width="1.5"/>
+  <ellipse cx="50" cy="87" rx="42" ry="4" fill="rgba(0,0,0,0.15)"/>
+</svg>
+</div>
+    <div class="platform-base"></div>
+    <div class="day-label">FINAL</div>
+  </div>
+
+</div>
+</div>
+
+<div class="corner-book" id="bookLeft">
+  <h3>1. INTRODUCCION Y JUSTIFICACION</h3>
+  <p style="margin:0;">Los descansos de primaria como espacios formativos de encuentro, juego y convivencia. Integrando el ASE al curriculo vivo.</p>
+</div>
+<div class="corner-book" id="bookRight">
+  <h3>7. CONCLUSIONES</h3>
+  <p style="margin:0;">El descanso es un laboratorio de ciudadania, alegria y flow. Un curriculo mas humano, sensible e inclusivo.</p>
+</div>
+
+<footer>Haz clic en cada estacion para avanzar en la ruta pedagogica 🎮</footer>
+
+<div id="overlay">
+  <div class="modal-box">
+    <span class="tag" id="modalTag"></span>
+    <h2 id="modalTitle"></h2>
+    <p id="modalBody"></p>
+    <button class="close-btn" id="closeBtn">CERRAR ▶</button>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>
