@@ -2,87 +2,151 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ruta semanal ASE</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>Camino de la Semana</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap"
+    rel="stylesheet"
+  />
 
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="loading">Cargando...</div>
-
-  <div id="welcomeOverlay">
-    <div class="welcomeBox">
-      <h1>Ruta semanal ASE</h1>
-      <p>
-        Recorre el camino, acércate a cada día y presiona <strong>E</strong>
-        para descubrir su aporte al aprendizaje social y emocional.
-      </p>
-      <p class="hint">También puedes usar flechas, WASD o controles táctiles.</p>
-      <button id="startBtn">Comenzar</button>
+  <div id="loading" class="loadingScreen">
+    <div class="loadingCard">
+      <h1>Camino de la Semana</h1>
+      <p>Cargando recorrido interactivo...</p>
     </div>
   </div>
 
-  <header id="hud">
-    <div class="hudBar">
+  <div id="welcomeOverlay" class="welcomeOverlay">
+    <div class="welcomeCard">
+      <h1>Camino de la Semana</h1>
+      <p>
+        Recorre cada día, explora sus aprendizajes y abre la información al
+        acercarte a cada estación.
+      </p>
+      <div class="welcomeTips">
+        <p><strong>PC:</strong> Usa flechas o WASD y pulsa E.</p>
+        <p><strong>Teléfono:</strong> Usa el joystick, el botón E o toca una isla.</p>
+      </div>
+      <button id="startBtn" class="startBtn">Comenzar</button>
+    </div>
+  </div>
+
+  <header class="topHud">
+    <div class="hudMetric">
       <span class="hudIcon">❤️</span>
-      <span>ASE</span>
-      <div class="barOuter">
-        <div id="aseBar" class="barInner red"></div>
+      <span class="hudLabel">ASE</span>
+      <div class="hudTrack">
+        <div id="aseBar" class="hudFill"></div>
       </div>
-      <span id="asePct">0%</span>
+      <span id="asePct" class="hudValue">0%</span>
     </div>
 
-    <div class="hudBar">
-      <span class="hudIcon">📅</span>
-      <span>SEMANA</span>
-      <div class="barOuter">
-        <div id="weekBar" class="barInner yellow"></div>
+    <div class="hudMetric">
+      <span class="hudIcon">🗓️</span>
+      <span class="hudLabel">SEMANA</span>
+      <div class="hudTrack">
+        <div id="weekBar" class="hudFill"></div>
       </div>
-      <span id="weekPct">0%</span>
+      <span id="weekPct" class="hudValue">0%</span>
     </div>
 
-    <div class="hudBar">
+    <div class="hudMetric">
       <span class="hudIcon">✨</span>
-      <span>FLOW</span>
-      <div class="barOuter">
-        <div id="flowBar" class="barInner green"></div>
+      <span class="hudLabel">FLOW</span>
+      <div class="hudTrack">
+        <div id="flowBar" class="hudFill"></div>
       </div>
-      <span id="flowPct">0%</span>
+      <span id="flowPct" class="hudValue">0%</span>
     </div>
 
-    <div id="progressBox">
-      <div id="progressFill"></div>
-      <span id="progressText">0/5 dias</span>
+    <div class="hudProgress">
+      <div class="hudProgressTrack">
+        <div id="progressFill" class="hudProgressFill"></div>
+      </div>
+      <span id="progressText" class="hudProgressText">0/5 días</span>
     </div>
   </header>
 
-  <div id="gameWrap">
-    <canvas id="game" width="1024" height="576"></canvas>
-  </div>
+  <main class="gameShell">
+    <section class="gameStage" aria-label="Juego interactivo">
+      <canvas
+        id="game"
+        width="1024"
+        height="576"
+        aria-label="Mapa interactivo de la semana"
+      ></canvas>
+    </section>
+  </main>
 
-  <div id="fade"></div>
+  <div
+    id="modalOverlay"
+    class="modalOverlay"
+    style="display:none;"
+    aria-hidden="true"
+  >
+    <div
+      class="modalCard"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modalTitle"
+    >
+      <div class="modalHeader">
+        <div class="modalHeaderText">
+          <span id="modalTag" class="modalTag">DÍA</span>
+          <h2 id="modalTitle">Título</h2>
+        </div>
+        <button id="closeBtn" class="closeBtn" aria-label="Cerrar modal">✕</button>
+      </div>
 
-  <div id="joystickZone">
-    <div id="joystickStick"></div>
-  </div>
-
-  <button id="btnAction" aria-label="Interactuar">E</button>
-
-  <div id="modalOverlay">
-    <div class="modalBox">
-      <div id="modalTag">DÍA</div>
-      <h2 id="modalTitle">Título</h2>
-      <div id="modalBody"></div>
-      <button id="closeBtn">Cerrar</button>
+      <div id="modalBody" class="modalBody"></div>
     </div>
   </div>
 
-  <script src="js/data.js"></script>
-  <script src="js/components.js"></script>
-  <script src="js/main.js"></script>
+  <div class="mobileHud" id="mobileHud">
+    <button id="rotateBtn" class="mobileAction secondary" aria-label="Poner en horizontal">
+      Horizontal
+    </button>
+
+    <div class="joystickWrap" id="joystickWrap" aria-label="Joystick de movimiento">
+      <div class="joystickBase" id="joystickBase">
+        <div class="joystickStick" id="joystickStick"></div>
+      </div>
+    </div>
+
+    <button
+      id="interactBtn"
+      class="mobileAction primary"
+      aria-label="Interactuar"
+    >
+      E
+    </button>
+  </div>
+
+  <div id="rotateHint" class="rotateHint" aria-hidden="true">
+    <div class="rotateCard">
+      <h3>Modo detalle</h3>
+      <p>
+        Gira el teléfono a horizontal para ver mejor el recorrido y usar los
+        controles con más espacio.
+      </p>
+      <button id="rotateNowBtn" class="mobileAction primary">Poner horizontal</button>
+      <button id="rotateCloseBtn" class="mobileAction secondary">Seguir así</button>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="components.js"></script>
+  <script src="main.js"></script>
 </body>
 </html>
