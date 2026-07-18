@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ruta semanal ASE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Work+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <a href="#mainContent" class="skip-link">Saltar al contenido principal</a>
+
+  <div id="loading" aria-live="polite">Cargando...</div>
+
+  <div id="welcomeOverlay" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle" aria-describedby="welcomeDesc">
+    <div class="welcomeBox">
+      <h1 id="welcomeTitle">Ruta semanal ASE</h1>
+      <p id="welcomeDesc">
+        Esta experiencia hace parte de <strong>Aula abierta para el aprovechamiento del tiempo libre</strong>,
+        una propuesta que transforma los descansos en espacios para jugar, crear, conversar y aprender juntos.
+      </p>
+      <p class="hint">
+        A lo largo de la semana encontrarás momentos de música, juego, movimiento, pensamiento y convivencia,
+        donde cada día aporta algo distinto al aprendizaje social y emocional.
+      </p>
+      <p class="hint">
+        Usa las flechas, WASD o los controles táctiles para recorrer la ruta y presiona <strong>E</strong>
+        cuando llegues a cada estación para descubrir qué se trabaja allí.
+      </p>
+      <button id="startBtn" type="button">Comenzar recorrido</button>
+    </div>
+  </div>
+
+  <header id="hud" aria-label="Indicadores de la ruta semanal ASE">
+    <div class="hudCluster">
+      <div class="hudBar">
+        <span class="hudIcon" aria-hidden="true">❤️</span>
+        <span class="hudLabel">ASE</span>
+        <div class="barOuter" aria-hidden="true"><div id="aseBar" class="barInner red"></div></div>
+        <span id="asePct">0%</span>
+      </div>
+      <div class="hudBar">
+        <span class="hudIcon" aria-hidden="true">📅</span>
+        <span class="hudLabel">SEMANA</span>
+        <div class="barOuter" aria-hidden="true"><div id="weekBar" class="barInner yellow"></div></div>
+        <span id="weekPct">0%</span>
+      </div>
+      <div class="hudBar">
+        <span class="hudIcon" aria-hidden="true">✨</span>
+        <span class="hudLabel">FLOW</span>
+        <div class="barOuter" aria-hidden="true"><div id="flowBar" class="barInner green"></div></div>
+        <span id="flowPct">0%</span>
+      </div>
+      <div id="progressBox" aria-label="Días visitados en la ruta semanal ASE">
+        <span id="progressText">0/5 días</span>
+      </div>
+    </div>
+  </header>
+
+  <main id="mainContent">
+    <section class="quickAccess" aria-labelledby="quickAccessHeading">
+      <h2 id="quickAccessHeading" class="sr-only">Acceso rápido a los días</h2>
+      <details class="quickAccessDetails">
+        <summary>Acceso rápido a los días</summary>
+        <div class="quickAccessBody">
+          <p>Puedes abrir un día directamente si prefieres no recorrer el mapa.</p>
+          <nav class="day-nav" aria-label="Abrir contenidos por día">
+            <button class="day-btn" type="button" data-day="d1">Lunes</button>
+            <button class="day-btn" type="button" data-day="d2">Martes</button>
+            <button class="day-btn" type="button" data-day="d3">Miércoles</button>
+            <button class="day-btn" type="button" data-day="d4">Jueves</button>
+            <button class="day-btn" type="button" data-day="d5">Viernes</button>
+          </nav>
+        </div>
+      </details>
+    </section>
+
+    <section id="gameSection" aria-labelledby="gameHeading">
+      <h2 id="gameHeading" class="sr-only">Mapa interactivo de la ruta semanal ASE</h2>
+      <div id="gameWrap">
+        <canvas id="game" width="1024" height="576" tabindex="0" aria-label="Mapa interactivo de la ruta semanal ASE"></canvas>
+      </div>
+    </section>
+  </main>
+
+  <div id="fade" aria-hidden="true"></div>
+  <div id="joystickZone" aria-label="Joystick táctil para moverse"><div id="joystickStick"></div></div>
+  <button id="btnAction" type="button" aria-label="Interactuar con el punto cercano">E</button>
+  <button id="btnRotate" type="button" aria-label="Poner en modo horizontal">↔</button>
+  <button id="btnBack" type="button" aria-label="Volver al modo normal">↩</button>
+
+  <div id="rotateHint" aria-hidden="true">
+    <div class="rotateBox">
+      <h3>Modo detalle</h3>
+      <p>Gira el teléfono o toca el botón para ver mejor la ruta semanal ASE.</p>
+      <button id="rotateNowBtn" type="button">Poner horizontal</button>
+      <button id="rotateCloseBtn" type="button">Seguir en vertical</button>
+    </div>
+  </div>
+
+  <div id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modalBox" tabindex="-1">
+      <div id="modalTag">DÍA</div>
+      <h2 id="modalTitle">Título</h2>
+      <div id="modalBody"></div>
+      <div class="modalActions">
+        <button id="closeBtn" type="button">Cerrar</button>
+        <button id="restartBtn" type="button" class="secondary hidden">Volver a empezar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
